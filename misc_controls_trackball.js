@@ -4,6 +4,9 @@ if (WEBGL.isWebGLAvailable() === false) {
 
 var camera, scene, controls, renderer, stats;
 
+init();
+animate();
+
 function init() {
     camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 1000);
     camera.position.z = 500;
@@ -27,16 +30,16 @@ function init() {
     //world
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xcccccc);
-    scene.fog = new THREE.FogExp2(0xcccccc, 0.002);
+    // scene.fog = new THREE.FogExp2(0xcccccc, 0.002);
 
     var geometry = new THREE.CylinderBufferGeometry(0, 10, 30, 4, 1);
     var material = new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true });
 
-    for (let i = 0; i < 500; i++) {
+    for (let i = 0; i < 50; i++) {
         var mesh = new THREE.Mesh(geometry, material);
-        mesh.position.x = (Math.random() - 0.5) * 1000;
-        mesh.position.y = (Math.random() - 0.5) * 1000;
-        mesh.position.z = (Math.random() - 0.5) * 1000;
+        mesh.position.x = (Math.random() - 0.5) * 100;
+        mesh.position.y = (Math.random() - 0.5) * 100;
+        mesh.position.z = (Math.random() - 0.5) * 100;
         mesh.updateMatrix();
         mesh.matrixAutoUpdate = true;
         scene.add(mesh);
@@ -46,11 +49,11 @@ function init() {
     light.position.set(1, 1, 1);
     scene.add(light);
 
-    var light = new THREE.DirectionalLight(0x002288);
+    var light = new THREE.DirectionalLight(0xff0000);
     light.position.set(-1, -1, -1);
     scene.add(light);
 
-    var light = new THREE.AmbientLight(0x222222);
+    var light = new THREE.AmbientLight(0x0000ff);
     scene.add(light);
 
     //render
@@ -72,9 +75,20 @@ function onWindowResize() {
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
 
-    renderer.setSize(window.innerWidth,window.innerHeight);
+    renderer.setSize(window.innerWidth, window.innerHeight);
 
     controls.handleResize();
 
     render();
+}
+
+function animate() {
+
+    requestAnimationFrame(animate);
+    controls.update();
+}
+
+function render() {
+    renderer.render(scene, camera);
+    stats.update();
 }
