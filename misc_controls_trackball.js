@@ -25,7 +25,7 @@ function init() {
 
     controls.keys = [65, 83, 68];
 
-    controls.addEventListener('change', render)
+    controls.addEventListener('change', render);
 
     //world
     scene = new THREE.Scene();

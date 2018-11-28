@@ -31,7 +31,7 @@ function init() {
     var geometry = new THREE.BoxBufferGeometry(20, 20, 20);
 
     for (let i = 0; i < 2000; i++) {
-        var object = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ));
+        var object = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial({ color: Math.random() * 0xffffff }));
 
         object.position.x = Math.random() * 800 - 400;
         object.position.y = Math.random() * 800 - 400;
@@ -104,20 +104,21 @@ function render() {
 
         if (INTERSCTED != intersects[0].object) {
 
-            if(INTERSCTED) INTERSCTED.material.emissive.setHex(INTERSCTED.currentHex);
+            if (INTERSCTED) INTERSCTED.material.emissive.setHex(INTERSCTED.currentHex);
 
             INTERSCTED = intersects[0].object;
             INTERSCTED.currentHex = INTERSCTED.material.emissive.getHex();
             INTERSCTED.material.emissive.setHex(0xff0000);
 
-        } else {
-
-            if (INTERSCTED) INTERSCTED.material.emissive.setHex(INTERSCTED.currentHex);
-
-            INTERSCTED = null;
-
         }
+        
+    } else {
 
-        renderer.render(scene, camera);
+        if (INTERSCTED) INTERSCTED.material.emissive.setHex(INTERSCTED.currentHex);
+
+        INTERSCTED = null;
+
     }
+
+    renderer.render(scene, camera);
 }
