@@ -1,22 +1,25 @@
 var container, stats;
-var camera, scene, raycaster, renderer;
+var raycaster, camera, scene, renderer;
 
 var mouse = new THREE.Vector2(), INTERSCTED;
 var radius = 100, theta = 0;
+
+init();
+animate();
 
 function init() {
     container = document.createElement('div');
     document.body.appendChild(container);
 
-    var info = document.createElement('div');
-    info.style.position = 'absolute';
-    info.style.top = '10px';
-    info.style.width = '100%';
-    info.style.textAlign = 'center';
-    info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive cubes';
-    container.appendChild(info);
+    // var info = document.createElement('div');
+    // info.style.position = 'absolute';
+    // info.style.top = '10px';
+    // info.style.width = '100%';
+    // info.style.textAlign = 'center';
+    // info.innerHTML = '<a href="http://threejs.org" target="_blank" rel="noopener">three.js</a> webgl - interactive cubes';
+    // container.appendChild(info);
 
-    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
+    camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 10000);
 
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0xf0f0f0);
@@ -28,7 +31,7 @@ function init() {
     var geometry = new THREE.BoxBufferGeometry(20, 20, 20);
 
     for (let i = 0; i < 2000; i++) {
-        var object = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial)
+        var object = new THREE.Mesh(geometry, new THREE.MeshLambertMaterial( { color: Math.random() * 0xffffff } ));
 
         object.position.x = Math.random() * 800 - 400;
         object.position.y = Math.random() * 800 - 400;
@@ -52,8 +55,8 @@ function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     container.appendChild(renderer.domElement);
 
-    stats = new Stats();
-    container.appendChild(stats.dom);
+    // stats = new Stats();
+    // container.appendChild(stats.dom);
 
     document.addEventListener('mousemove', onDocumentMouseMove, false);
 
@@ -76,18 +79,45 @@ function onDocumentMouseMove(event) {
 }
 
 function animate() {
+
     requestAnimationFrame(animate);
 
-    renderer();
-    stats.update();
+    render();
+    // stats.update();
 }
 
 function render() {
-    theta+=0.1;
+    theta += 0.1;
 
-    camera.position.x=radius*Math.sin(THREE.Math.degToRad(theta));
-    camera.position.y=radius*Math.sin(THREE.Math.degToRad(theta));
-    camera.position.z=radius*Math.sin(THREE.Math.degToRad(theta));
+    camera.position.x = radius * Math.sin(THREE.Math.degToRad(theta));
+    camera.position.y = radius * Math.sin(THREE.Math.degToRad(theta));
+    camera.position.z = radius * Math.cos(THREE.Math.degToRad(theta));
     camera.lookAt(scene.position);
 
+    camera.updateMatrixWorld();
+
+    raycaster.setFromCamera(mouse, camera);
+
+    var intersects = raycaster.intersectObjects(scene.children);
+
+    if (intersects.length > 0) {
+
+        if (INTERSCTED != intersects[0].object) {
+
+            if(INTERSCTED) INTERSCTED.material.emissive.setHex(INTERSCTED.currentHex);
+
+            INTERSCTED = intersects[0].object;
+            INTERSCTED.currentHex = INTERSCTED.material.emissive.getHex();
+            INTERSCTED.material.emissive.setHex(0xff0000);
+
+        } else {
+
+            if (INTERSCTED) INTERSCTED.material.emissive.setHex(INTERSCTED.currentHex);
+
+            INTERSCTED = null;
+
+        }
+
+        renderer.render(scene, camera);
+    }
 }
