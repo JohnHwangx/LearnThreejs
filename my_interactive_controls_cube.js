@@ -19,21 +19,15 @@ class DomElement {
     }
 
     update(camera) {
-        // var matrix = this.worldMatrix.multiplyMatrices(camera.projectionMatrix, this.worldMatrix.getInverse(camera.matrixWorld));
-        // var vector = this.position3D.applyMatrix4(matrix);
 
-        var vector=
+        var vectorClone=this.position3D.clone();
 
-        var test = this.position3D.project(camera);
+        var vector = vectorClone.project(camera);
         var scr_x = (0.5 + vector.x / 2) * window.innerWidth;
         var scr_y = (0.5 - vector.y / 2) * window.innerHeight;
 
         this.element.style.left = scr_x + 'px';
         this.element.style.top = scr_y + 'px';
-
-
-        // var test = this.worldMatrix.multiplyMatrices(camera.projectionMatrix, this.worldMatrix.getInverse(camera.matrixWorld));
-        // this.app
     }
 
     hindElement() {
@@ -148,12 +142,10 @@ function onDocumentMouseUp(event) {
 
     if (lastMouse.x === event.clientX && lastMouse.y === event.clientY) {
 
-        event.preventDefault();
-
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-        raycaster = new THREE.Raycaster();//delete!!!!!**********************************************************************
+        // raycaster = new THREE.Raycaster();//delete!!!!!**********************************************************************
         raycaster.setFromCamera(mouse, camera);
         var intersects = raycaster.intersectObjects(scene.children);
 
@@ -173,7 +165,11 @@ function onDocumentMouseUp(event) {
                 var infoWorldMatrix = INTERSECTED.matrixWorld;
                 var position3D = INTERSECTED.getWorldPosition();
 
-                info.setPos(event.clientX, event.clientY, position3D, infoWorldMatrix);
+                var realPosition=intersects[0].point;
+
+                // var vectorClone=position3D.clone();
+
+                info.setPos(event.clientX, event.clientY, realPosition, infoWorldMatrix);
             }
         }
         else {
