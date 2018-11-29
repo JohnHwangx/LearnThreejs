@@ -1,12 +1,64 @@
+// document.write("<script language=javascript src='domElement.js'></script> ");
+
+class DomElement {
+    constructor(value) {
+
+        this.element = document.createElement('div');
+        this.element.style.width = '50px';
+        this.element.style.position = 'absolute';
+        this.element.style.color = '#00ff00';
+        this.element.innerHTML = value;
+    }
+
+    setPos(posx, posy, position3D, worldMatrix) {
+        this.element.style.visibility = 'visible';
+        this.element.style.left = posx + 'px';
+        this.element.style.top = posy + 'px';
+        this.worldMatrix = worldMatrix;
+        this.position3D = position3D;
+    }
+
+    update(camera) {
+        // var matrix = this.worldMatrix.multiplyMatrices(camera.projectionMatrix, this.worldMatrix.getInverse(camera.matrixWorld));
+        // var vector = this.position3D.applyMatrix4(matrix);
+
+        var vector=
+
+        var test = this.position3D.project(camera);
+        var scr_x = (0.5 + vector.x / 2) * window.innerWidth;
+        var scr_y = (0.5 - vector.y / 2) * window.innerHeight;
+
+        this.element.style.left = scr_x + 'px';
+        this.element.style.top = scr_y + 'px';
+
+
+        // var test = this.worldMatrix.multiplyMatrices(camera.projectionMatrix, this.worldMatrix.getInverse(camera.matrixWorld));
+        // this.app
+    }
+
+    hindElement() {
+        this.element.style.visibility = 'hidden';
+    }
+}
+
 var camera, scene, controls, renderer, stats;
 
-var raycaster, mouse = new THREE.Vector2(), INTERSECTED;
+var raycaster = new THREE.Raycaster();
+var mouse = new THREE.Vector2(), INTERSECTED;
 var radius = 100, theta = 0;
+
+var container, info;
 
 init();
 animate();
 
 function init() {
+
+    container = document.createElement('div');
+    document.body.appendChild(container);
+
+    info = new DomElement('value');
+    container.appendChild(info.element);
 
     camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
     camera.position.z = 500;
@@ -51,7 +103,7 @@ function init() {
         scene.add(object);
     }
 
-    raycaster = new THREE.Raycaster();
+    // raycaster = new THREE.Raycaster();
 
     var light = new THREE.DirectionalLight(0xffffff, 1);
     light.position.set(1, 1, 1);
@@ -65,16 +117,21 @@ function init() {
     stats = new Stats();
     document.body.appendChild(stats.dom);
 
-    // document.addEventListener('click', onDocumentClick, false);
-
     document.addEventListener('mousedown', onDocumentMouseDown, false);
     document.addEventListener('mouseup', onDocumentMouseUp, false);
 
-    //document.addEventListener('dblclick')
+    controls.addEventListener('change', onControlsChanged, false);
 
     window.addEventListener('resize', onWindowResize, false);
 
     render();
+}
+
+function onControlsChanged(event) {
+    // var posx = event.clientX;
+    // var posy = event.clientY;
+
+    info.update(camera);
 }
 
 var lastMouse = new THREE.Vector2();
@@ -96,6 +153,7 @@ function onDocumentMouseUp(event) {
         mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
         mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
+        raycaster = new THREE.Raycaster();//delete!!!!!**********************************************************************
         raycaster.setFromCamera(mouse, camera);
         var intersects = raycaster.intersectObjects(scene.children);
 
@@ -111,6 +169,11 @@ function onDocumentMouseUp(event) {
                 INTERSECTED = intersects[0].object;
                 INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
                 INTERSECTED.material.emissive.setHex(0xff0000);
+
+                var infoWorldMatrix = INTERSECTED.matrixWorld;
+                var position3D = INTERSECTED.getWorldPosition();
+
+                info.setPos(event.clientX, event.clientY, position3D, infoWorldMatrix);
             }
         }
         else {
@@ -118,6 +181,7 @@ function onDocumentMouseUp(event) {
             if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
 
             INTERSECTED = null;
+            info.hindElement();
         }
 
         render();
