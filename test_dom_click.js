@@ -1,10 +1,10 @@
 // document.write("<script language=javascript src='domElement.js'></script>");
 
 class DomElement {
-    constructor(value, id) {
+    constructor(value) {
 
         this.element = document.createElement('div');
-        this.element.id = id;
+        // this.element.id = id;
         this.element.style.width = '50px';
         this.element.style.position = 'absolute';
         this.element.style.color = '#00ff00';
@@ -20,24 +20,25 @@ class DomElement {
 
 var container, info;
 var lastMouse = new THREE.Vector2();
-var index;
+// var index;
+var indexList = new Array();
 
 init();
 
 function init() {
 
-    index = 0;
+    // index = 0;
     container = document.createElement('div');
     document.body.appendChild(container);
 
     var value = 'test';
-    info = new DomElement(value, index);
+    info = new DomElement(value);
     container.appendChild(info.element);
 
     document.addEventListener('mousedown', onDocumnetMouseDown, false);
     document.addEventListener('mouseup', onDocumentMouseUp, false);
 
-    document.addEventListener()
+    // document.addEventListener()
 
 }
 
@@ -56,20 +57,28 @@ function onDocumentMouseUp(event) {
 
         if (event.ctrlKey) {
 
-            index++;
+            // index++;
 
-            var newInfo = new DomElement('value', index);
+            var newInfo = new DomElement('value');
             container.appendChild(newInfo.element);
             newInfo.setPos(event.clientX, event.clientY);
+
+            indexList.push(newInfo.element);
 
         }
         else {
 
-            for(let i=1;i<=index;i++){
+            // for (let i = 0; i < indexList.length; i++) {
+            //     element = indexList[i];
+            //     if (element!=null){
+            //         element.parentNode.removeChild(element);
+            //     }
+            // }            
 
-                var delDiv=document.getElementById(i);
-                if(delDiv!=null){
-                    delDiv.parentNode.removeChild(delDiv);
+            while (indexList.length > 0) {
+                var element = indexList.shift();
+                if (element != null) {
+                    element.parentNode.removeChild(element);
                 }
             }
 
