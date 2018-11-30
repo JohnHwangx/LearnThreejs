@@ -39,11 +39,9 @@ class DomElement {
 var camera, scene, controls, renderer, stats;
 
 var raycaster = new THREE.Raycaster();
-var mouse = new THREE.Vector2(), INTERSECTED;
-var radius = 100, theta = 0;
+var mouse = new THREE.Vector2();
 
-var container, info;
-// var index;
+var container;
 var nodeList = new Array();
 var infoList = new Array();
 
@@ -51,13 +49,9 @@ init();
 animate();
 
 function init() {
-
-    // index = 0;
+    
     container = document.createElement('div');
     document.body.appendChild(container);
-
-    info = new DomElement('value');
-    container.appendChild(info.element);
 
     camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
     camera.position.z = 500;
@@ -102,8 +96,6 @@ function init() {
         scene.add(object);
     }
 
-    // raycaster = new THREE.Raycaster();
-
     var light = new THREE.DirectionalLight(0xffffff, 1);
     light.position.set(1, 1, 1);
     scene.add(light);
@@ -127,14 +119,12 @@ function init() {
 }
 
 function onControlsChanged(event) {
-    // var posx = event.clientX;
-    // var posy = event.clientY;
+    //文字位置变换
+    for (newInfo in infoList) {
 
-    info.update(camera);
-
-    for (const newInfo in infoList) {
         if (infoList.hasOwnProperty(newInfo)) {
-            newInfo.
+
+            infoList[newInfo].update(camera);
         }
     }
 }
@@ -153,102 +143,47 @@ function onDocumentMouseUp(event) {
 
     if (lastMouse.x === event.clientX && lastMouse.y === event.clientY) {
 
-        if (event.ctrlKey) {
+        mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+        mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
 
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+        raycaster.setFromCamera(mouse, camera);
+        var intersects = raycaster.intersectObjects(scene.children);
 
-            raycaster.setFromCamera(mouse, camera);
-            var intersects = raycaster.intersectObjects(scene.children);
-
-            if (intersects.length > 0) {
-
-                // if (INTERSECTED != intersects[0].object) {
-
-                // if (INTERSECTED) {
-
-                //     INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
-                // }
-
-                var newIntersected = intersects[0].object;
-                newIntersected.currentHex = newIntersected.material.emissive.getHex();
-                newIntersected.material.emissive.setHex(0xff0000);
-
-                nodeList.push(newIntersected);
-
-                // var infoWorldMatrix = newIntersected.matrixWorld;
-                // var position3D = INTERSECTED.getWorldPosition();
-
-                var realPosition = intersects[0].point;
-                
-                var newNode = new DomElement('value');
-                container.appendChild(newNode.element);
-                newNode.setPos(event.clientX, event.clientY, realPosition);
-
-                infoList.push(newNode.element);
-
-                // info.setPos(event.clientX, event.clientY, realPosition);
-                // }
-            }
-            // else {
-
-            //     if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
-
-            //     INTERSECTED = null;
-            //     info.hindElement();
-            // }
-
-            render();
-        }
-        else {
-
+        if (!event.ctrlKey) {
             while (infoList.length > 0) {
-                var element = infoList.shift();
+
+                var element = infoList.shift().element;
                 if (element != null) {
                     element.parentNode.removeChild(element);
                 }
             }
 
-            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
-            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+            while (nodeList.length > 0) {
 
-            // raycaster = new THREE.Raycaster();//delete!!!!!**********************************************************************
-            raycaster.setFromCamera(mouse, camera);
-            var intersects = raycaster.intersectObjects(scene.children);
-
-            if (intersects.length > 0) {
-
-                if (INTERSECTED != intersects[0].object) {
-
-                    if (INTERSECTED) {
-
-                        INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
-                    }
-
-                    INTERSECTED = intersects[0].object;
-                    INTERSECTED.currentHex = INTERSECTED.material.emissive.getHex();
-                    INTERSECTED.material.emissive.setHex(0xff0000);
-
-                    // var infoWorldMatrix = INTERSECTED.matrixWorld;
-                    // var position3D = INTERSECTED.getWorldPosition();
-
-                    var realPosition = intersects[0].point;
-
-                    // var vectorClone=position3D.clone();
-
-                    info.setPos(event.clientX, event.clientY, realPosition);
+                var node = nodeList.shift();
+                if (node) {
+                    node.material.emissive.setHex(node.currentHex);
                 }
             }
-            else {
-
-                if (INTERSECTED) INTERSECTED.material.emissive.setHex(INTERSECTED.currentHex);
-
-                INTERSECTED = null;
-                info.hindElement();
-            }
-
-            render();
         }
+
+        if (intersects.length > 0) {
+
+            var intersected = intersects[0].object;
+            intersected.currentHex = intersected.material.emissive.getHex();
+            intersected.material.emissive.setHex(0xff0000);
+
+            nodeList.push(intersected);
+
+            var realPosition = intersects[0].point;
+            var infoNode = new DomElement('value');
+            container.appendChild(infoNode.element);
+            infoNode.setPos(event.clientX, event.clientY, realPosition);
+
+            infoList.push(infoNode);
+        }
+
+        render();
     }
 }
 
@@ -256,6 +191,14 @@ function onWindowResize() {
 
     camera.aspect = window.innerWidth / window.innerHeight;
     camera.updateProjectionMatrix();
+
+    for (newInfo in infoList) {
+
+        if (infoList.hasOwnProperty(newInfo)) {
+
+            infoList[newInfo].update(camera);
+        }
+    }
 
     renderer.setSize(window.innerWidth, window.innerHeight);
 

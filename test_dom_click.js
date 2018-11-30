@@ -1,5 +1,3 @@
-// document.write("<script language=javascript src='domElement.js'></script>");
-
 class DomElement {
     constructor(value) {
 
