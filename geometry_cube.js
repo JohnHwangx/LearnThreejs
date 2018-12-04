@@ -13,7 +13,9 @@ function init() {
 
     var texture = new THREE.TextureLoader().load('textures/crate.gif');
 
-    var geometry = new THREE.BoxBufferGeometry(200, 200, 200);
+    // var geometry = new THREE.BoxBufferGeometry(200, 200, 200);
+
+    var geometry = new THREE.CylinderBufferGeometry(0,100,200,6);
     var material = new THREE.MeshBasicMaterial({ map: texture });
 
     mesh = new THREE.Mesh(geometry, material);
