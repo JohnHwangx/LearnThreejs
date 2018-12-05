@@ -49,7 +49,7 @@ init();
 animate();
 
 function init() {
-    
+
     container = document.createElement('div');
     document.body.appendChild(container);
 
