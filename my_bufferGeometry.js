@@ -1,5 +1,6 @@
 var container, stats;
-var camera, scene, renderer, controls, mesh,n;
+var camera, scene, renderer,  mesh,n;
+var controls;
 
 init();
 // animate();
@@ -10,22 +11,25 @@ function init() {
     document.body.appendChild(container);
 
     camera = new THREE.PerspectiveCamera(27, window.innerWidth / window.innerHeight, 1, 3500);
-    camera.position.z = 2750;
+    camera.position.z = 2750; 
 
-    controls = new THREE.TrackballControls(camera);
-    controls.rotateSpeed = 1.0;
-    controls.zoomSpeed = 1.2;
-    controls.panSpeed = 0.8;
-    controls.noZoom = false;
-    controls.noPan = false;
-    controls.staticMoving = true;
-    controls.dynamicDampingFactor = 0.3;
-    controls.keys = [65, 83, 68];
-    controls.addEventListener('change', render);
+    // controls = new THREE.TrackballControls(camera);
+    // controls.rotateSpeed = 1.0;
+    // controls.zoomSpeed = 1.2;
+    // controls.panSpeed = 0.8;
+    // controls.noZoom = false;
+    // controls.noPan = false;
+    // controls.staticMoving = true;
+    // controls.dynamicDampingFactor = 0.3;
+    // controls.keys = [65, 83, 68];
+    // controls.addEventListener('change', render);
 
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x050505);
-    scene.add(new THREE.AmbientLight(0x444444));
+    scene.add(new THREE.AmbientLight(0x444444));   
+    scene.add(camera);
+
+    controls = new THREE.OrbitControls(camera, container);
 
     var light1 = new THREE.DirectionalLight(0xffffff, 0.5);
     light1.position.set(1, 1, 1);
@@ -157,6 +161,7 @@ function initGUI() {
     var folder=gui.addFolder('accuracy');
     folder.add(params,'RadialSegment',3,100).step(1).onChange(function (value) {
         n=value;
+        render();
     });
     folder.open();
 }
