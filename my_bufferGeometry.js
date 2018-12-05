@@ -1,6 +1,8 @@
 var container, stats;
-var camera, scene, renderer,  mesh,n;
+var camera, scene, renderer, mesh;
+var bufferGeometry;
 var controls;
+var material;
 
 init();
 // animate();
@@ -11,23 +13,14 @@ function init() {
     document.body.appendChild(container);
 
     camera = new THREE.PerspectiveCamera(27, window.innerWidth / window.innerHeight, 1, 3500);
-    camera.position.z = 2750; 
-
-    // controls = new THREE.TrackballControls(camera);
-    // controls.rotateSpeed = 1.0;
-    // controls.zoomSpeed = 1.2;
-    // controls.panSpeed = 0.8;
-    // controls.noZoom = false;
-    // controls.noPan = false;
-    // controls.staticMoving = true;
-    // controls.dynamicDampingFactor = 0.3;
-    // controls.keys = [65, 83, 68];
-    // controls.addEventListener('change', render);
+    camera.position.z = 2750;
 
     scene = new THREE.Scene();
     scene.background = new THREE.Color(0x050505);
-    scene.add(new THREE.AmbientLight(0x444444));   
+    scene.add(new THREE.AmbientLight(0x444444));
     scene.add(camera);
+
+    //scene.remove()
 
     controls = new THREE.OrbitControls(camera, container);
 
@@ -35,13 +28,44 @@ function init() {
     light1.position.set(1, 1, 1);
     scene.add(light1);
 
+    bufferGeometry = createGeometry(3);
+
+    material = new THREE.MeshPhongMaterial({
+        color: 0xaaaaaa, specular: 0xffffff, shin: 250,
+        side: THREE.DoubleSide, vertexColors: THREE.VertexColors
+    });
+
+    mesh = new THREE.Mesh(bufferGeometry, material);
+    // mesh.name='mesh';    
+    scene.add(mesh);
+
+    initGUI();
+
+    renderer = new THREE.WebGLRenderer();
+    renderer.setPixelRatio(window.devicePixelRatio);
+    renderer.setSize(window.innerWidth, window.innerHeight);
+
+    renderer.setAnimationLoop(function () {
+        renderer.render(scene, camera);
+    });
+    container.appendChild(renderer.domElement);
+
+    stats = new Stats();
+    container.appendChild(stats.dom);
+
+    window.addEventListener('resize', onWindowResize, false);
+
+    // render();
+}
+
+function createGeometry(n) {
+
     var bufferGeometry = new THREE.BufferGeometry();
     var positions = [];
     var normals = [];
     var colors = [];
     var color = new THREE.Color();
 
-    n=3;
     var height = 300, radius = 200;
     var angle = Math.PI * 2 / n;
 
@@ -123,44 +147,29 @@ function init() {
     bufferGeometry.addAttribute('normal', new THREE.Float32BufferAttribute(normals, 3));
     bufferGeometry.addAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
 
-    bufferGeometry.computeBoundingSphere();
-
-    var material = new THREE.MeshPhongMaterial({
-        color: 0xaaaaaa, specular: 0xffffff, shin: 250,
-        side: THREE.DoubleSide, vertexColors: THREE.VertexColors
-    });
-
-    mesh = new THREE.Mesh(bufferGeometry, material);
-    scene.add(mesh);
-
-    initGUI();
-
-    renderer = new THREE.WebGLRenderer();
-    renderer.setPixelRatio(window.devicePixelRatio);
-    renderer.setSize(window.innerWidth, window.innerHeight);
-
-    renderer.setAnimationLoop(function () {
-        renderer.render(scene, camera);
-    });
-    container.appendChild(renderer.domElement);
-
-    stats = new Stats();
-    container.appendChild(stats.dom);
-
-    window.addEventListener('resize', onWindowResize, false);
-
-    render();
+    // bufferGeometry.computeBoundingSphere();
+    return bufferGeometry;
 }
 
 function initGUI() {
-    var params={
-        RadialSegment:3,
+    var params = {
+        RadialSegment: 3,
     };
 
-    var gui=new dat.GUI();
-    var folder=gui.addFolder('accuracy');
-    folder.add(params,'RadialSegment',3,100).step(1).onChange(function (value) {
-        n=value;
+    var gui = new dat.GUI();
+    var folder = gui.addFolder('accuracy');
+    folder.add(params, 'RadialSegment', 3, 100).step(1).onChange(function (value) {
+
+        //n = value;
+        bufferGeometry = createGeometry(value);
+        mesh = new THREE.Mesh(bufferGeometry, material);
+
+        var allChildren = scene.children;
+        var lastObject = allChildren[allChildren.length - 1];
+        if (lastObject instanceof THREE.Mesh) {
+            scene.remove(lastObject);
+            scene.add(mesh);
+        }
         render();
     });
     folder.open();
@@ -172,8 +181,8 @@ function onWindowResize() {
 
     renderer.setSize(window.innerWidth, window.innerHeight);
 
-    controls.handleResize();
-    render();
+    // controls.handleResize();
+    // render();
 }
 
 function animate() {
