@@ -4,6 +4,7 @@ var cintainer;
 var positions = new Array();
 
 init();
+animate();
 
 function init() {
 
@@ -37,17 +38,26 @@ function init() {
         scene.add(object);
     }
 
-    camera.position = positions[0];//设置相机初始位置在第一个cube处
+    camera.position.set(positions[0].x,positions[0].y,positions[0].z);//设置相机初始位置在第一个cube处
     camera.lookAt(positions[1]);
 
     var light = new THREE.DirectionalLight(0xffffff, 1);
     light.position.set(1, 1, 1);
     scene.add(light);
 
-    renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer = new THREE.WebGLRenderer();
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
+
+    window.addEventListener('resize',onWindowResize,false);
+}
+
+function onWindowResize() {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+
+    renderer.setSize(window.innerWidth, window.innerHeight);
 }
 
 function animate() {
@@ -70,5 +80,10 @@ function render() {
     direction.normalize();
     var moveDistance =direction.multiplyScalar(speed);
     let position=moveDistance.add(camera.position);//相机移动距离
-    camera.position=position;
+    camera.position.set(position.x,position.y,position.z);
+    camera.lookAt(positions[1]);
+
+    // renderer.clear();
+
+    renderer.render(scene,camera);
 }
