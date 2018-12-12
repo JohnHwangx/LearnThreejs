@@ -1,11 +1,11 @@
 var camera, scene, renderer, mesh;
-var cintainer;
+var container;
 
-var currentIndex;//当前相机观察的物体的编号
-var meshCount = 3;//模型数量
+var targetIndex;//当前相机观察的物体的编号
+var meshCount = 4;//模型数量
 
 var positions = new Array();
-var speed = 1;
+var speed = 50;
 
 init();
 animate();
@@ -15,7 +15,7 @@ function init() {
     container = document.createElement('div');
     document.body.appendChild(container);
 
-    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
     //camera.position.z = 500;
 
     scene = new THREE.Scene();
@@ -25,26 +25,29 @@ function init() {
 
     var geometry = new THREE.BoxBufferGeometry(20, 20, 20);
 
-    let colors = [0xff0000, 0x00ff00, 0x0000ff];
+    let colors = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00];
+
+    let distance=500;
+    let meshPositions = [[distance, 0, distance], [-distance, 0, distance], [-distance, 0, -distance], [distance, 0, -distance]]
     for (let i = 0; i < meshCount; i++) {
 
-        var material = new THREE.MeshLambertMaterial({ color:colors[i] });
+        var material = new THREE.MeshLambertMaterial({ color: colors[i] });
         var object = new THREE.Mesh(geometry, material);
 
-        object.position.x = Math.random() * 200 - 100;
-        object.position.y = Math.random() * 200 - 100;
-        object.position.z = Math.random() * 200 - 100;
+        object.position.x = meshPositions[i][0];
+        object.position.y = meshPositions[i][1];
+        object.position.z = meshPositions[i][2];
 
         positions.push(object.position);
 
-        object.rotation.x = Math.random() * 2 * Math.PI;
-        object.rotation.y = Math.random() * 2 * Math.PI;
-        object.rotation.z = Math.random() * 2 * Math.PI;
+        // object.rotation.x = Math.random() * 2 * Math.PI;
+        // object.rotation.y = Math.random() * 2 * Math.PI;
+        // object.rotation.z = Math.random() * 2 * Math.PI;
 
         scene.add(object);
     }
 
-    currentIndex = 1;
+    targetIndex = 1;
 
     camera.position.set(positions[0].x, positions[0].y, positions[0].z);//设置相机初始位置在第一个cube处
     camera.lookAt(positions[1]);
@@ -79,36 +82,37 @@ function animate() {
 
 function render() {
 
+    let targetPosition=positions[targetIndex].clone();
     //判断相机是否在Mesh处，设置精度为5
-    let vector = positions[currentIndex].sub(camera.position);
-    let distance = vector.length();
+    targetPosition.sub(camera.position);
+    let distance = targetPosition.length();
 
-    if (distance < 100) {
-        if (currentIndex == meshCount - 1) {
-            currentIndex = 0;
+    if (distance== 0) {
+        if (targetIndex == meshCount - 1) {
+            targetIndex = 0;
         } else {
-            currentIndex++;
+            targetIndex++;
         }
     }
 
-    let lastIndex = currentIndex - 1;
-    if (currentIndex == 0) {
-        lastIndex = meshCount - 1;
+    let originIndex = targetIndex - 1;
+    if (targetIndex == 0) {
+        originIndex = meshCount - 1;
     }
-    else if (currentIndex == meshCount - 1) {
-        lastIndex = 0
+    else if (targetIndex == meshCount - 1) {
+        originIndex = 0
     }
 
     let direction = new THREE.Vector3();
 
-    //direction.sub();
+    //direction.clone();
 
-    direction.subVectors(positions[currentIndex], positions[lastIndex]);
+    direction.subVectors(positions[targetIndex], positions[originIndex]);
     direction.normalize();
     var moveDistance = direction.multiplyScalar(speed);
     let position = moveDistance.add(camera.position);//相机移动距离
     camera.position.set(position.x, position.y, position.z);
-    camera.lookAt(positions[currentIndex]);
+    camera.lookAt(positions[targetIndex]);
 
     // renderer.clear();
 
