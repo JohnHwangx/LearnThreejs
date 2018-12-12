@@ -5,7 +5,7 @@ var targetIndex;//当前相机观察的物体的编号
 var meshCount = 4;//模型数量
 
 var positions = new Array();
-var speed = 50;
+var speed = 5;
 
 init();
 animate();
@@ -27,7 +27,7 @@ function init() {
 
     let colors = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00];
 
-    let distance=500;
+    let distance = 500;
     let meshPositions = [[distance, 0, distance], [-distance, 0, distance], [-distance, 0, -distance], [distance, 0, -distance]]
     for (let i = 0; i < meshCount; i++) {
 
@@ -47,12 +47,19 @@ function init() {
         scene.add(object);
     }
 
+
+    let planematerial = new THREE.MeshPhongMaterial({
+        color: 0xaaaaaa, specular: 0xffffff, shin: 250,
+        side: THREE.DoubleSide, vertexColors: THREE.VertexColors
+    });
+    let planeGeometry = createPlane();
+    let planeMesh = new THREE.Mesh(planeGeometry,planematerial);
+    scene.add(planeMesh);
+
     targetIndex = 1;
 
     camera.position.set(positions[0].x, positions[0].y, positions[0].z);//设置相机初始位置在第一个cube处
     camera.lookAt(positions[1]);
-
-    var equal = camera.position.equals(positions[0]);
 
     var light = new THREE.DirectionalLight(0xffffff, 1);
     light.position.set(1, 1, 1);
@@ -82,12 +89,12 @@ function animate() {
 
 function render() {
 
-    let targetPosition=positions[targetIndex].clone();
+    let targetPosition = positions[targetIndex].clone();
     //判断相机是否在Mesh处，设置精度为5
     targetPosition.sub(camera.position);
     let distance = targetPosition.length();
 
-    if (distance== 0) {
+    if (distance == 0) {
         if (targetIndex == meshCount - 1) {
             targetIndex = 0;
         } else {
@@ -99,9 +106,9 @@ function render() {
     if (targetIndex == 0) {
         originIndex = meshCount - 1;
     }
-    else if (targetIndex == meshCount - 1) {
-        originIndex = 0
-    }
+    // else if (targetIndex == meshCount - 1) {
+    //     originIndex = 0
+    // }
 
     let direction = new THREE.Vector3();
 
@@ -117,4 +124,29 @@ function render() {
     // renderer.clear();
 
     renderer.render(scene, camera);
+}
+
+function createPlane() {
+    let planeGeometry = new THREE.BufferGeometry();
+    let positions = [];
+    positions.push(1000, 0, 1000);
+    positions.push(-1000, 0, 1000);
+    positions.push(-1000, 0, -1000);
+    positions.push(-1000, 0, -1000);
+    positions.push(1000, 0, 1000);
+    positions.push(1000, 0, -1000);
+
+    var color = new THREE.Color();
+    color.setRGB(0.2, 0.8, 0.6);
+    let colors = [];
+    colors.push(color.r, color.g, color.b);
+    colors.push(color.r, color.g, color.b);
+    colors.push(color.r, color.g, color.b);
+    colors.push(color.r, color.g, color.b);
+    colors.push(color.r, color.g, color.b);
+    colors.push(color.r, color.g, color.b);
+
+    planeGeometry.addAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    planeGeometry.addAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    return planeGeometry;
 }

@@ -16,7 +16,7 @@ function init() {
     camera.position.z = 2750;
 
     scene = new THREE.Scene();
-    scene.background = new THREE.Color(0x050505);
+    scene.background = new THREE.Color(0xf0f0f0);
     scene.add(new THREE.AmbientLight(0x444444));
     scene.add(camera);
 
@@ -39,6 +39,10 @@ function init() {
     // mesh.name='mesh';    
     scene.add(mesh);
 
+    let planeGeometry = createPlane();
+    let planeMesh = new THREE.Mesh(planeGeometry,material);
+    scene.add(planeMesh);
+
     initGUI();
 
     renderer = new THREE.WebGLRenderer();
@@ -56,6 +60,31 @@ function init() {
     window.addEventListener('resize', onWindowResize, false);
 
     // render();
+}
+
+function createPlane() {
+    let planeGeometry = new THREE.BufferGeometry();
+    let positions = [];
+    positions.push(500, 0, 500);
+    positions.push(-500, 0, 500);
+    positions.push(-500, 0, -500);
+    positions.push(-500, 0, -500);
+    positions.push(500, 0, 500);
+    positions.push(500, 0, -500);
+
+    var color = new THREE.Color();
+    color.setRGB(Math.random(), Math.random(), Math.random());
+    let colors = [];
+    colors.push(color.r, color.g, color.b);
+    colors.push(color.r, color.g, color.b);
+    colors.push(color.r, color.g, color.b);
+    colors.push(color.r, color.g, color.b);
+    colors.push(color.r, color.g, color.b);
+    colors.push(color.r, color.g, color.b);
+
+    planeGeometry.addAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    planeGeometry.addAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    return planeGeometry;
 }
 
 function createGeometry(n) {
