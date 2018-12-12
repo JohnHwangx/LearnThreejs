@@ -1,7 +1,11 @@
 var camera, scene, renderer, mesh;
 var cintainer;
 
+var currentIndex;//当前相机观察的物体的编号
+var meshCount = 3;//模型数量
+
 var positions = new Array();
+var speed = 1;
 
 init();
 animate();
@@ -11,7 +15,7 @@ function init() {
     container = document.createElement('div');
     document.body.appendChild(container);
 
-    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
+    camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 10000);
     //camera.position.z = 500;
 
     scene = new THREE.Scene();
@@ -20,10 +24,12 @@ function init() {
     scene.add(camera);
 
     var geometry = new THREE.BoxBufferGeometry(20, 20, 20);
-    for (let i = 0; i < 3; i++) {
 
-        var material = new THREE.MeshLambertMaterial({ color: Math.random() * 0xffffff, wireframe: true });
-        var object = new THREE.Mesh(geometry)
+    let colors = [0xff0000, 0x00ff00, 0x0000ff];
+    for (let i = 0; i < meshCount; i++) {
+
+        var material = new THREE.MeshLambertMaterial({ color:colors[i] });
+        var object = new THREE.Mesh(geometry, material);
 
         object.position.x = Math.random() * 200 - 100;
         object.position.y = Math.random() * 200 - 100;
@@ -38,8 +44,12 @@ function init() {
         scene.add(object);
     }
 
-    camera.position.set(positions[0].x,positions[0].y,positions[0].z);//设置相机初始位置在第一个cube处
+    currentIndex = 1;
+
+    camera.position.set(positions[0].x, positions[0].y, positions[0].z);//设置相机初始位置在第一个cube处
     camera.lookAt(positions[1]);
+
+    var equal = camera.position.equals(positions[0]);
 
     var light = new THREE.DirectionalLight(0xffffff, 1);
     light.position.set(1, 1, 1);
@@ -50,7 +60,7 @@ function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    window.addEventListener('resize',onWindowResize,false);
+    window.addEventListener('resize', onWindowResize, false);
 }
 
 function onWindowResize() {
@@ -64,26 +74,43 @@ function animate() {
 
     requestAnimationFrame(animate);
 
-
-
     render();
 }
 
 function render() {
 
-    let r = Date.now() * 0.0005;
-    let speed = 5;
-    let distance = camera.position.distanceTo(positions[1]);
+    //判断相机是否在Mesh处，设置精度为5
+    let vector = positions[currentIndex].sub(camera.position);
+    let distance = vector.length();
 
-    let direction=new THREE.Vector3();
-    direction.subVectors(positions[1],positions[0]);
+    if (distance < 100) {
+        if (currentIndex == meshCount - 1) {
+            currentIndex = 0;
+        } else {
+            currentIndex++;
+        }
+    }
+
+    let lastIndex = currentIndex - 1;
+    if (currentIndex == 0) {
+        lastIndex = meshCount - 1;
+    }
+    else if (currentIndex == meshCount - 1) {
+        lastIndex = 0
+    }
+
+    let direction = new THREE.Vector3();
+
+    //direction.sub();
+
+    direction.subVectors(positions[currentIndex], positions[lastIndex]);
     direction.normalize();
-    var moveDistance =direction.multiplyScalar(speed);
-    let position=moveDistance.add(camera.position);//相机移动距离
-    camera.position.set(position.x,position.y,position.z);
-    camera.lookAt(positions[1]);
+    var moveDistance = direction.multiplyScalar(speed);
+    let position = moveDistance.add(camera.position);//相机移动距离
+    camera.position.set(position.x, position.y, position.z);
+    camera.lookAt(positions[currentIndex]);
 
     // renderer.clear();
 
-    renderer.render(scene,camera);
+    renderer.render(scene, camera);
 }
