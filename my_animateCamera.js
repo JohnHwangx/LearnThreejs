@@ -10,10 +10,13 @@ var positionDistance;//相机起点和终点的距离
 var originDirection = new THREE.Vector3();//相机移动的方向，到达目标点后作为原始方向
 var targetDirection = new THREE.Vector3();//在相机旋转时使用，旋转的目标向量
 
+var meshColors = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0x00ffff, 0xff00ff];
+var meshPositions = [[0, 0, 0], [-400, 0, 200], [-400, 0, - 400], [0, 0, -600], [400, 0, -400], [400, 0, 200]];
+
 var positions = new Array();
 var speed = 5;
 var rotateAngle = 0;
-var rotateSpeed = Math.PI / 152;
+var rotateSpeed = Math.PI / 180;
 var totalAngle;
 
 var isMove = false;
@@ -37,14 +40,14 @@ function init() {
 
     var geometry = new THREE.BoxBufferGeometry(20, 20, 20);
 
-    let colors = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00];
+    //let colors = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00];
 
-    let distance = 500;
-    let meshPositions = [[distance, 0, distance], [-distance, 0, distance], [-distance, 0, -distance], [distance, 0, -distance]];
-    meshPositions=[[0,40,0],[-400,-40,200],[-400,40,-400],[0,-40,600],[400,40,-400],[400,-40,200]];
-    for (let i = 0; i < meshCount; i++) {
+    // let distance = 500;
+    // let meshPositions = [[distance, 0, distance], [-distance, 0, distance], [-distance, 0, -distance], [distance, 0, -distance]];
+    // meshPositions=[[000],[-400,0200],[-4000-400],[0,0600],[4000-400],[400,0200]];
+    for (let i = 0; i < meshPositions.length; i++) {
 
-        var material = new THREE.MeshLambertMaterial({ color: colors[i] });
+        var material = new THREE.MeshBasicMaterial({ color: meshColors[i] });
         var object = new THREE.Mesh(geometry, material);
 
         object.position.x = meshPositions[i][0];
@@ -79,6 +82,9 @@ function init() {
 
     var light = new THREE.DirectionalLight(0xffffff, 1);
     light.position.set(1, 1, 1);
+    scene.add(light);
+
+    var light = new THREE.AmbientLight(0xffffff);
     scene.add(light);
 
     renderer = new THREE.WebGLRenderer();
@@ -143,7 +149,7 @@ function render() {
             // originDistance = originDirection.length();
 
             //计算目标点的索引
-            if (targetIndex == meshCount - 1) {
+            if (targetIndex == meshPositions.length - 1) {
                 targetIndex = 0;
             } else {
                 targetIndex++;
@@ -151,7 +157,7 @@ function render() {
             //计算起始点的索引
             originIndex = targetIndex - 1;
             if (targetIndex == 0) {
-                originIndex = meshCount - 1;
+                originIndex = meshPositions.length - 1;
             }
 
             isRotate = true;
@@ -179,12 +185,20 @@ function render() {
         lookArDirection.add(camera.position);
         camera.lookAt(lookArDirection);
 
-        //如果旋转到目标方向，就开始移动
-        if (lookArDirection.distanceTo(positions[targetIndex]) <= 0.00001) {
+        lookArDirection.sub(positions[originIndex]);
+        lookArDirection.normalize();// 相机旋转后的方向向量
+        if(lookArDirection.distanceTo(targetDirection.normalize()) <= 0.00001){
             isRotate = false;
             isMove = true;
             rotateAngle = 0;
         }
+
+        //如果旋转到目标方向，就开始移动，无效判断，需用方向向量判断
+        // if (lookArDirection.distanceTo(positions[targetIndex]) <= 0.00001) {
+        //     isRotate = false;
+        //     isMove = true;
+        //     rotateAngle = 0;
+        // }
 
     }
 
@@ -219,7 +233,7 @@ function render() {
     renderer.render(scene, camera);
 }
 
-function createPlane() {
+function createPlane1() {
     let planeGeometry = new THREE.BufferGeometry();
     let positions = [];
     positions.push(500, -10, 500);
@@ -241,6 +255,54 @@ function createPlane() {
     colors.push(color.r, color.g, color.b);
 
     planeGeometry.addAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+    planeGeometry.addAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+    return planeGeometry;
+}
+
+function createPlane() {
+    let planeGeometry = new THREE.BufferGeometry();
+    let gomPositions = [];
+    gomPositions.push(meshPositions[0][0], meshPositions[0][1] - 10, meshPositions[0][2]);
+    gomPositions.push(meshPositions[1][0], meshPositions[1][1] - 10, meshPositions[1][2]);
+    gomPositions.push(meshPositions[2][0], meshPositions[2][1] - 10, meshPositions[2][2]);
+
+    gomPositions.push(meshPositions[0][0], meshPositions[0][1] - 10, meshPositions[0][2]);
+    gomPositions.push(meshPositions[2][0], meshPositions[2][1] - 10, meshPositions[2][2]);
+    gomPositions.push(meshPositions[3][0], meshPositions[3][1] - 10, meshPositions[3][2]);
+
+    gomPositions.push(meshPositions[0][0], meshPositions[0][1] - 10, meshPositions[0][2]);
+    gomPositions.push(meshPositions[3][0], meshPositions[3][1] - 10, meshPositions[3][2]);
+    gomPositions.push(meshPositions[4][0], meshPositions[4][1] - 10, meshPositions[4][2]);
+
+    gomPositions.push(meshPositions[0][0], meshPositions[0][1] - 10, meshPositions[0][2]);
+    gomPositions.push(meshPositions[4][0], meshPositions[4][1] - 10, meshPositions[4][2]);
+    gomPositions.push(meshPositions[5][0], meshPositions[5][1] - 10, meshPositions[5][2]);
+
+    let planeColors = new Array();
+    for (let i = 0; i < meshColors.length; i++) {
+
+        let color = new THREE.Color(meshColors[i]);
+        planeColors.push(color);
+
+    }
+    let colors = [];
+    colors.push(planeColors[0].r, planeColors[0].g, planeColors[0].b);
+    colors.push(planeColors[1].r, planeColors[1].g, planeColors[1].b);
+    colors.push(planeColors[2].r, planeColors[2].g, planeColors[2].b);
+
+    colors.push(planeColors[0].r, planeColors[0].g, planeColors[0].b);
+    colors.push(planeColors[2].r, planeColors[2].g, planeColors[2].b);
+    colors.push(planeColors[3].r, planeColors[3].g, planeColors[3].b);
+
+    colors.push(planeColors[0].r, planeColors[0].g, planeColors[0].b);
+    colors.push(planeColors[3].r, planeColors[3].g, planeColors[3].b);
+    colors.push(planeColors[4].r, planeColors[4].g, planeColors[4].b);
+
+    colors.push(planeColors[0].r, planeColors[0].g, planeColors[0].b);
+    colors.push(planeColors[4].r, planeColors[4].g, planeColors[4].b);
+    colors.push(planeColors[5].r, planeColors[5].g, planeColors[5].b);
+
+    planeGeometry.addAttribute('position', new THREE.Float32BufferAttribute(gomPositions, 3));
     planeGeometry.addAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
     return planeGeometry;
 }
