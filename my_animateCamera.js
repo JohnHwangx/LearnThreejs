@@ -11,7 +11,7 @@ var originDirection = new THREE.Vector3();//相机移动的方向，到达目标
 var targetDirection = new THREE.Vector3();//在相机旋转时使用，旋转的目标向量
 
 var meshColors = [0xff0000, 0x00ff00, 0x0000ff, 0xffff00, 0x00ffff, 0xff00ff];
-var meshPositions = [[0, 0, 0], [-400, 0, 200], [-400, 0, - 400], [0, 0, -600], [400, 0, -400], [400, 0, 200]];
+var meshPositions = [[0, 40, 0], [-400, -40, 200], [-400, 40, - 400], [0, -40, -600], [400, 40, -400], [400, -40, 200]];
 
 var positions = new Array();
 var speed = 5;
@@ -130,6 +130,27 @@ function initGUI() {
     floder.open();
 }
 
+function rotateOnAxis(originVector, targetVector, angle) {
+
+    let currentVector = originVector.clone();
+    let n = currentVector.cross(targetVector);//法向量
+    n.normalize();
+
+    let vector = new THREE.Vector3();
+    // let cos = Math.cos(rotateAngle);
+    // let sin = Math.sin(rotateAngle);
+    // let x = originVector.x, y = originVector.y, z = originVector.z;
+    // let n1 = n.x * n.x, n2 = n.x * n.y, n3 = n.x * n.z, n4 = n.y * n.y, n5 = n.y * n.z, n6 = n.z * n.z;
+    // vector.x = x * (n1 * (1 - cos) + cos) + y * (n2 * (1 - cos) - n.z * sin) + z * (n3 * (1 - cos) + n.y * sin);
+    // vector.y = x * (n2 * (1 - cos) + n.z * sin) + y * (n4 * (1 - cos) + cos) + z * (n5 * (1 - cos) - n.x * sin);
+    // vector.z = x * (n3 * (1 - cos) - n.y * sin) + y * (n5 * (1 - cos) + n.x * sin) + z * (n6 * (1 - cos) + cos);
+
+    currentVector = originVector.clone();
+    currentVector.applyAxisAngle(n, angle);
+
+    return currentVector;
+}
+
 function render() {
 
     let targetPosition = positions[targetIndex].clone();
@@ -177,17 +198,18 @@ function render() {
 
         //let tempDirection = originDirection.clone();
         //设置相机旋转
-        let lookArDirection = new THREE.Vector3();
-        lookArDirection.x = originDirection.x * Math.cos(rotateAngle) - originDirection.z * Math.sin(rotateAngle);
-        lookArDirection.y = 0;
-        lookArDirection.z = originDirection.x * Math.sin(rotateAngle) + originDirection.z * Math.cos(rotateAngle);
+        // let lookArDirection = new THREE.Vector3();
+        // lookArDirection.x = originDirection.x * Math.cos(rotateAngle) - originDirection.z * Math.sin(rotateAngle);
+        // lookArDirection.y = 0;
+        // lookArDirection.z = originDirection.x * Math.sin(rotateAngle) + originDirection.z * Math.cos(rotateAngle);
+        let lookArDirection = rotateOnAxis(originDirection, targetDirection, rotateAngle);
 
         lookArDirection.add(camera.position);
         camera.lookAt(lookArDirection);
 
         lookArDirection.sub(positions[originIndex]);
         lookArDirection.normalize();// 相机旋转后的方向向量
-        if(lookArDirection.distanceTo(targetDirection.normalize()) <= 0.00001){
+        if (lookArDirection.distanceTo(targetDirection.normalize()) <= 0.00001) {
             isRotate = false;
             isMove = true;
             rotateAngle = 0;
@@ -231,32 +253,6 @@ function render() {
     }
 
     renderer.render(scene, camera);
-}
-
-function createPlane1() {
-    let planeGeometry = new THREE.BufferGeometry();
-    let positions = [];
-    positions.push(500, -10, 500);
-    positions.push(-500, -10, 500);
-    positions.push(-500, -10, -500);
-    positions.push(-500, -10, -500);
-    positions.push(500, -10, 500);
-    positions.push(500, -10, -500);
-
-
-    var color = new THREE.Color();
-    color.setRGB(0.2, 0.8, 0.6);
-    let colors = [];
-    colors.push(color.r, color.g, color.b);
-    colors.push(color.r, color.g, color.b);
-    colors.push(color.r, color.g, color.b);
-    colors.push(color.r, color.g, color.b);
-    colors.push(color.r, color.g, color.b);
-    colors.push(color.r, color.g, color.b);
-
-    planeGeometry.addAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
-    planeGeometry.addAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-    return planeGeometry;
 }
 
 function createPlane() {
