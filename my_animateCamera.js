@@ -215,13 +215,6 @@ function render() {
             rotateAngle = 0;
         }
 
-        //如果旋转到目标方向，就开始移动，无效判断，需用方向向量判断
-        // if (lookArDirection.distanceTo(positions[targetIndex]) <= 0.00001) {
-        //     isRotate = false;
-        //     isMove = true;
-        //     rotateAngle = 0;
-        // }
-
     }
 
     //相机移动

@@ -24,7 +24,7 @@ function init() {
     for (let i = 0; i < 1000; i++) {
 
         var mesh = new THREE.Mesh(geometry, material);
-        mesh.position.x = Math.random() * 2000 - 1000;//?为什么减1000
+        mesh.position.x = Math.random() * 2000 - 1000;//-1000 ~ +1000
         mesh.position.y = Math.random() * 2000 - 1000;
         mesh.position.z = Math.random() * 2000 - 1000;
 
