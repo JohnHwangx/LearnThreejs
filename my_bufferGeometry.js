@@ -5,7 +5,7 @@ var controls;
 var material;
 
 init();
-// animate();
+animate();
 
 function init() {
 
@@ -45,13 +45,14 @@ function init() {
 
     initGUI();
 
-    renderer = new THREE.WebGLRenderer();
+    renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.autoClear = false;
 
-    renderer.setAnimationLoop(function () {
-        renderer.render(scene, camera);
-    });
+    // renderer.setAnimationLoop(function () {
+    //     renderer.render(scene, camera);
+    // });
     container.appendChild(renderer.domElement);
 
     stats = new Stats();
@@ -191,14 +192,15 @@ function initGUI() {
 
         //n = value;
         bufferGeometry = createGeometry(value);
-        mesh = new THREE.Mesh(bufferGeometry, material);
+        //mesh = new THREE.Mesh(bufferGeometry, material);
+        mesh.geometry=bufferGeometry;
 
-        var allChildren = scene.children;
-        var lastObject = allChildren[allChildren.length - 1];
-        if (lastObject instanceof THREE.Mesh) {
-            scene.remove(lastObject);
-            scene.add(mesh);
-        }
+        // var allChildren = scene.children;
+        // var lastObject = allChildren[allChildren.length - 1];
+        // if (lastObject instanceof THREE.Mesh) {
+        //     scene.remove(lastObject);
+        //     scene.add(mesh);
+        // }
         render();
     });
     folder.open();
@@ -217,7 +219,7 @@ function onWindowResize() {
 function animate() {
     requestAnimationFrame(animate);
 
-    //render();
+    render();
     controls.update();
     stats.update();
 }

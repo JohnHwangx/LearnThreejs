@@ -14,6 +14,8 @@ function start() {
 
     var renderCount = 100;//每帧渲染100个mesh
 
+    var group;
+
     init();
     animate();
 
@@ -22,22 +24,19 @@ function start() {
         container = document.createElement('div');
         document.body.appendChild(container);
 
+        renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+        renderer.setPixelRatio(window.devicePixelRatio);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.autoClearColor = false;
+        renderer.autoClearDepth = false;
+        container.appendChild(renderer.domElement);
+
         tag = 0;
 
         camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
         camera.position.z = 2000;
 
         controls = new THREE.OrbitControls(camera, container);
-        // controls.rotateSpeed = 1.0;
-        // controls.zoomSpeed = 1.2;
-        // controls.panSpeed = 0.8;
-
-        // controls.noZoom = false;
-        // controls.noPan = false;
-
-        // controls.staticMoving = true;
-        // controls.dynamicDampingFactor = 0.3;
-        // controls.keys = [65, 83, 68];
 
         scene = new THREE.Scene();
         scene.background = new THREE.Color(0xcccccc);
@@ -52,12 +51,10 @@ function start() {
         let ambientLight = new THREE.AmbientLight(0xffffff);
         scene.add(ambientLight);
 
-        initGUI();
+        group = new THREE.Group();
+        scene.add(group);
 
-        renderer = new THREE.WebGLRenderer({ antialias: true });
-        renderer.setPixelRatio(window.devicePixelRatio);
-        renderer.setSize(window.innerWidth, window.innerHeight);
-        container.appendChild(renderer.domElement);
+        initGUI();
 
         stats = new Stats();
         container.appendChild(stats.dom);
@@ -65,6 +62,8 @@ function start() {
         controls.addEventListener('change', onControlsChanged, false);
 
         window.addEventListener('resize', onWindowResize, false);
+
+        // renderer.clear();
     }
 
     //创建500个形状、大小和方向不同的geometry
@@ -112,7 +111,7 @@ function start() {
             }
         }
 
-        //return group;
+        // return group;
     }
 
     function initGUI() {
@@ -127,14 +126,16 @@ function start() {
 
         });
         folder.add(params, 'MeshCount', 1000, 50000).step(500).onChange(function (value) {
+
             let changeMeshsCount = value - meshs.length;//需要增加或减少的mesh数量
             if (changeMeshsCount > 0) {//增加mesh
+                // if (value == 4000) {
                 createMesh(changeMeshsCount);
-            } else {//减少mesh
-                meshs.splice(changeMeshsCount);
-                let decreaseGroupCount = changeMeshsCount / renderCount;//scene需要减少的group数量
-                let groupNum = scene.children.length;
-                scene.children.splice(groupNum - decreaseGroupCount);
+                // }
+            } else if (changeMeshsCount < 0) {//减少mesh
+                meshs.splice(value);
+                renderer.clear();
+                tag = 0;
             }
             render();
         });
@@ -142,11 +143,12 @@ function start() {
     }
 
     function onControlsChanged() {
-        //if (tag === meshs.length) {
         tag = 0;
+        //scene.children.splice(2);//??如何判断scene中的节点为group
+        //group.length=0
+        renderer.clear();
+        //group=new THREE.Group();
 
-        scene.children.splice(2);//??如何判断scene中的节点为group
-        //}
     }
 
     function onWindowResize() {
@@ -154,13 +156,16 @@ function start() {
         camera.updateProjectionMatrix();
 
         renderer.setSize(window.innerWidth, window.innerHeight);
-        controls.handleResize();
+        //controls.handleResize();
 
         render();
     }
 
     function animate() {
-        requestAnimationFrame(animate);
+
+        setTimeout(() => {
+            requestAnimationFrame(animate);
+        }, 1000 / 90);
 
         controls.update();
 
@@ -173,15 +178,15 @@ function start() {
 
         if (tag != meshs.length) {
             let renderMeshs = meshs.slice(tag, tag + renderCount);
-            let group = new THREE.Group();
+            // let tempGroup = new THREE.Group();
+
+            group.children.length = 0
             renderMeshs.forEach(element => {
 
                 group.add(element);
             });
-            scene.add(group);
             tag += renderCount;
         }
-
         renderer.render(scene, camera);
     }
 }
