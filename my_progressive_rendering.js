@@ -27,22 +27,22 @@ function start() {
         camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 1, 10000);
         camera.position.z = 2000;
 
-        controls = new THREE.TrackballControls(camera);
-        controls.rotateSpeed = 1.0;
-        controls.zoomSpeed = 1.2;
-        controls.panSpeed = 0.8;
+        controls = new THREE.OrbitControls(camera, container);
+        // controls.rotateSpeed = 1.0;
+        // controls.zoomSpeed = 1.2;
+        // controls.panSpeed = 0.8;
 
-        controls.noZoom = false;
-        controls.noPan = false;
+        // controls.noZoom = false;
+        // controls.noPan = false;
 
-        controls.staticMoving = true;
-        controls.dynamicDampingFactor = 0.3;
-        controls.keys = [65, 83, 68];
+        // controls.staticMoving = true;
+        // controls.dynamicDampingFactor = 0.3;
+        // controls.keys = [65, 83, 68];
 
         scene = new THREE.Scene();
         scene.background = new THREE.Color(0xcccccc);
 
-        let group = createMesh(1000);//初始1000个mesh
+        createMesh(1000);//初始1000个mesh
         //scene.add(group);
 
         let light = new THREE.DirectionalLight(0xffffff, 1);
@@ -52,12 +52,14 @@ function start() {
         let ambientLight = new THREE.AmbientLight(0xffffff);
         scene.add(ambientLight);
 
+        initGUI();
+
         renderer = new THREE.WebGLRenderer({ antialias: true });
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
+        container.appendChild(renderer.domElement);
 
-        stats=new Stats();
+        stats = new Stats();
         container.appendChild(stats.dom);
 
         controls.addEventListener('change', onControlsChanged, false);
@@ -89,8 +91,8 @@ function start() {
     function createMesh(meshCount) {
         createGeometry();
 
-        let typeCount = meshCount/(geometries.length);//5000个mesh
-        let group = new THREE.Group();
+        let typeCount = meshCount / (geometries.length);//5000个mesh
+        // let group = new THREE.Group();
         for (let i = 0; i < materials.length; i++) {
             for (let j = 0; j < typeCount; j++) {
                 for (let k = 0; k < 5; k++) {
@@ -105,27 +107,36 @@ function start() {
 
                     meshs.push(mesh);
 
-                    group.add(mesh);
+                    // group.add(mesh);
                 }
             }
         }
 
-        return group;
+        //return group;
     }
 
-    function initGUI(){
-        var params={
-            FragmentRate:30,
-            MeshCount:1000,
+    function initGUI() {
+        var params = {
+            FragmentRate: 30,
+            MeshCount: 1000,
         };
 
-        var gui=new dat.GUI();
-        var folder=gui.addFolder('Adjuster');
-        folder.add(params,'FragmentRate',20,60).step(10).onChange(function(value){
+        var gui = new dat.GUI();
+        var folder = gui.addFolder('Adjuster');
+        folder.add(params, 'FragmentRate', 20, 60).step(10).onChange(function (value) {
 
         });
-        folder.add(params,'MeshCount',1000,50000).step(500).onChange(function(value){
-            let currentMeshCount=
+        folder.add(params, 'MeshCount', 1000, 50000).step(500).onChange(function (value) {
+            let changeMeshsCount = value - meshs.length;//需要增加或减少的mesh数量
+            if (changeMeshsCount > 0) {//增加mesh
+                createMesh(changeMeshsCount);
+            } else {//减少mesh
+                meshs.splice(changeMeshsCount);
+                let decreaseGroupCount = changeMeshsCount / renderCount;//scene需要减少的group数量
+                let groupNum = scene.children.length;
+                scene.children.splice(groupNum - decreaseGroupCount);
+            }
+            render();
         });
         folder.open();
     }
