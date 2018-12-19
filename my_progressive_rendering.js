@@ -42,7 +42,7 @@ function start() {
         scene = new THREE.Scene();
         scene.background = new THREE.Color(0xcccccc);
 
-        let group = createMesh();
+        let group = createMesh(1000);//初始1000个mesh
         //scene.add(group);
 
         let light = new THREE.DirectionalLight(0xffffff, 1);
@@ -86,18 +86,19 @@ function start() {
         }
     }
 
-    function createMesh() {
+    function createMesh(meshCount) {
         createGeometry();
-        let typeCount = 10;//5000个mesh
+
+        let typeCount = meshCount/(geometries.length);//5000个mesh
         let group = new THREE.Group();
         for (let i = 0; i < materials.length; i++) {
             for (let j = 0; j < typeCount; j++) {
                 for (let k = 0; k < 5; k++) {
 
                     let mesh = new THREE.Mesh(geometries[i + k], materials[i]);
-                    mesh.position.x = Math.random() * 2000 - 1000;//-1000 ~ +1000
-                    mesh.position.y = Math.random() * 2000 - 1000;//-1000 ~ +1000
-                    mesh.position.z = Math.random() * 2000 - 1000;//-1000 ~ +1000
+                    mesh.position.x = Math.random() * 4000 - 2000;//-2000 ~ +2000
+                    mesh.position.y = Math.random() * 4000 - 2000;//-2000 ~ +2000
+                    mesh.position.z = Math.random() * 4000 - 2000;//-2000 ~ +2000
 
                     mesh.rotation.x = Math.random() * 2 * Math.PI;
                     mesh.rotation.y = Math.random() * 2 * Math.PI;
@@ -113,20 +114,27 @@ function start() {
     }
 
     function initGUI(){
-        var param={
+        var params={
             FragmentRate:30,
             MeshCount:1000,
         };
 
         var gui=new dat.GUI();
-        var folder=gui.addFolder('')
+        var folder=gui.addFolder('Adjuster');
+        folder.add(params,'FragmentRate',20,60).step(10).onChange(function(value){
+
+        });
+        folder.add(params,'MeshCount',1000,50000).step(500).onChange(function(value){
+            let currentMeshCount=
+        });
+        folder.open();
     }
 
     function onControlsChanged() {
         //if (tag === meshs.length) {
         tag = 0;
 
-        scene.children.splice(2);
+        scene.children.splice(2);//??如何判断scene中的节点为group
         //}
     }
 
@@ -153,14 +161,14 @@ function start() {
     function render() {
 
         if (tag != meshs.length) {
-            let renderMeshs = meshs.slice(tag, tag + 100);
+            let renderMeshs = meshs.slice(tag, tag + renderCount);
             let group = new THREE.Group();
             renderMeshs.forEach(element => {
 
                 group.add(element);
             });
             scene.add(group);
-            tag += 100;
+            tag += renderCount;
         }
 
         renderer.render(scene, camera);
