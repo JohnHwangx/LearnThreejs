@@ -1,3 +1,5 @@
+// import { BooleanKeyframeTrack } from "three";
+
 start();
 function start() {
 
@@ -15,6 +17,8 @@ function start() {
     var renderCount = 100;//每帧渲染100个mesh
 
     var group;
+    //var renderStart = false, lastFrame = 0, deltaTime = 0;
+    var totalTimePerFrame = 0;//
 
     init();
     animate();
@@ -41,12 +45,14 @@ function start() {
         scene = new THREE.Scene();
         scene.background = new THREE.Color(0xcccccc);
 
-        createMesh(1000);//初始1000个mesh
+        createMesh(20000);//初始1000个mesh
+
+        orderByFace()
         //scene.add(group);
 
-        let light = new THREE.DirectionalLight(0xffffff, 1);
-        light.position.set(1, 1, 1);
-        scene.add(light);
+        // let light = new THREE.DirectionalLight(0xffffff, 1);
+        // light.position.set(1, 1, 1);
+        // scene.add(light);
 
         let ambientLight = new THREE.AmbientLight(0xffffff);
         scene.add(ambientLight);
@@ -66,6 +72,12 @@ function start() {
         // renderer.clear();
     }
 
+    function orderByFace(){
+        meshs.sort(function(first,second){
+            return first.geometry.index.count-second.geometry.index.count;
+        }).reverse();
+    }
+
     //创建500个形状、大小和方向不同的geometry
     function createGeometry() {
         for (let i = 0; i < 100; i++) {
@@ -82,8 +94,18 @@ function start() {
             geometries.push(cone);
             geometries.push(tetrahedron);
 
-            let material = new THREE.MeshBasicMaterial({ color: 0xffffff * Math.random() });
-            materials.push(material);
+            if (i % 4 === 0) {
+                let material = new THREE.MeshStandardMaterial( {
+                    // color:0xff0000,
+					opacity: 0.5,
+					transparent: true
+				} );
+                materials.push(material);
+            }
+            else {
+                let material = new THREE.MeshBasicMaterial({ color: 0xffffff * Math.random() });
+                materials.push(material);
+            }
         }
     }
 
@@ -105,6 +127,8 @@ function start() {
                     mesh.rotation.y = Math.random() * 2 * Math.PI;
 
                     meshs.push(mesh);
+
+                //    let face= mesh.geometry.index.count;
 
                     // group.add(mesh);
                 }
@@ -162,31 +186,66 @@ function start() {
     }
 
     function animate() {
+        //return;
+        requestAnimationFrame(animate);
 
-        setTimeout(() => {
-            requestAnimationFrame(animate);
-        }, 1000 / 90);
+
+        // if(!renderStart){
+        //     renderStart=true;
+        //     lastFrame=performance.now();
+        //     deltaTime=0;
+        // }else{
+        //     let currentFrame=performance.now();
+        //     deltaTime=currentFrame-lastFrame;
+        //     lastFrame=currentFrame;
+        // }
+
+        // setTimeout(() => {
+        //     requestAnimationFrame(animate);
+        // }, 1000 / 90);
 
         controls.update();
 
-        render();
-
         stats.update();
+
+        if (tag != meshs.length) {
+
+            render();
+        }
+
     }
 
     function render() {
 
-        if (tag != meshs.length) {
-            let renderMeshs = meshs.slice(tag, tag + renderCount);
-            // let tempGroup = new THREE.Group();
+        do {
+            // let lastTemp=performance.now();
+            let lastFrame = performance.now();
 
-            group.children.length = 0
-            renderMeshs.forEach(element => {
+            if (tag != meshs.length) {
+                let renderMeshs = meshs.slice(tag, tag + renderCount);
+                // let tempGroup = new THREE.Group();
 
-                group.add(element);
-            });
-            tag += renderCount;
-        }
-        renderer.render(scene, camera);
+                group.children = renderMeshs;
+                tag += renderCount;
+            } else {
+                group.children = [];
+            }
+
+            // let currentTemp=performance.now();
+            // console.log('calculateTime:'+(currentTemp-lastTemp));
+
+
+
+            renderer.render(scene, camera);
+
+            let currentFrame = performance.now();
+            let deltaTime = currentFrame - lastFrame;
+            totalTimePerFrame += deltaTime;
+
+            // console.log('renderTime: ' + totalTimePerFrame + " deltaTime: " + deltaTime);
+
+        } while (totalTimePerFrame <= (10 / 30));
+
+        totalTimePerFrame = 0;
     }
 }
