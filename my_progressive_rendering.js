@@ -19,6 +19,11 @@ function start() {
     var group;
     //var renderStart = false, lastFrame = 0, deltaTime = 0;
     var totalTimePerFrame = 0;//
+    var frameRate=30;
+    var params = {
+        FragmentRate: 30,
+        MeshCount: 1000,
+    };
 
     init();
     animate();
@@ -149,15 +154,12 @@ function start() {
     }
 
     function initGUI() {
-        var params = {
-            FragmentRate: 30,
-            MeshCount: 1000,
-        };
 
         var gui = new dat.GUI();
         var folder = gui.addFolder('Adjuster');
         folder.add(params, 'FragmentRate', 20, 60).step(10).onChange(function (value) {
-
+            frameRate=value;
+            render();
         });
         folder.add(params, 'MeshCount', 1000, 50000).step(500).onChange(function (value) {
 
@@ -199,21 +201,6 @@ function start() {
         //return;
         requestAnimationFrame(animate);
 
-
-        // if(!renderStart){
-        //     renderStart=true;
-        //     lastFrame=performance.now();
-        //     deltaTime=0;
-        // }else{
-        //     let currentFrame=performance.now();
-        //     deltaTime=currentFrame-lastFrame;
-        //     lastFrame=currentFrame;
-        // }
-
-        // setTimeout(() => {
-        //     requestAnimationFrame(animate);
-        // }, 1000 / 90);
-
         controls.update();
 
         stats.update();
@@ -240,12 +227,7 @@ function start() {
             } else {
                 group.children = [];
             }
-
-            // let currentTemp=performance.now();
-            // console.log('calculateTime:'+(currentTemp-lastTemp));
-
-
-
+            
             renderer.render(scene, camera);
 
             let currentFrame = performance.now();
@@ -254,7 +236,7 @@ function start() {
 
             // console.log('renderTime: ' + totalTimePerFrame + " deltaTime: " + deltaTime);
 
-        } while (totalTimePerFrame <= (10 / 30));
+        } while (totalTimePerFrame <= (10 / frameRate));
 
         totalTimePerFrame = 0;
     }
