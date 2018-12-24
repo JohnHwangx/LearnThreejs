@@ -47,7 +47,8 @@ function start() {
 
         createMesh(20000);//初始1000个mesh
 
-        orderByFace()
+        // orderByFace()
+        orderByMaterial();
         //scene.add(group);
 
         // let light = new THREE.DirectionalLight(0xffffff, 1);
@@ -72,9 +73,16 @@ function start() {
         // renderer.clear();
     }
 
-    function orderByFace(){
-        meshs.sort(function(first,second){
-            return first.geometry.index.count-second.geometry.index.count;
+    function orderByFace() {
+        meshs.sort(function (first, second) {
+            return first.geometry.index.count - second.geometry.index.count;
+        }).reverse();
+    }
+
+    function orderByMaterial() {
+
+        meshs.sort(function (first, second) {
+            return first.material.opacity - second.material.opacity;
         }).reverse();
     }
 
@@ -95,15 +103,17 @@ function start() {
             geometries.push(tetrahedron);
 
             if (i % 4 === 0) {
-                let material = new THREE.MeshStandardMaterial( {
+                let material = new THREE.MeshBasicMaterial({
                     // color:0xff0000,
-					opacity: 0.5,
-					transparent: true
-				} );
+                    opacity: 0.5,
+                    transparent: true
+                });
                 materials.push(material);
             }
             else {
-                let material = new THREE.MeshBasicMaterial({ color: 0xffffff * Math.random() });
+                let material = new THREE.MeshBasicMaterial({
+                    color: 0xffffff * Math.random()
+                });
                 materials.push(material);
             }
         }
@@ -128,7 +138,7 @@ function start() {
 
                     meshs.push(mesh);
 
-                //    let face= mesh.geometry.index.count;
+                    // let face = mesh.material.opacity
 
                     // group.add(mesh);
                 }
