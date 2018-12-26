@@ -3,7 +3,7 @@
 (function () {
     var camera, mesh, scene, renderer;
     var controls;
-    var lineNum = 1000;
+    var lineNum = 10;
 
     (function () {
         let container = document.createElement('div');
@@ -63,7 +63,7 @@
     }
 
     function createLines() {
-        let diameter = 5000;
+        let diameter = 1000;
         let geometry = new THREE.BufferGeometry();
         let positions = [];
         let colors = [];
@@ -73,32 +73,42 @@
 
         for (let i = 0; i < lineNum; i++) {
 
-            // for (let j = 0; j < 2; j++) {
-            let r = (Math.random() - 0.5) * diameter;
-            let alpha = Math.random() * pi2;
-            let beta = Math.random() * pi2;
-            let x1 = r * Math.sin(alpha) * Math.cos(beta);
-            let y1 = r * Math.sin(alpha) * Math.sin(beta);
-            let z1 = r * Math.cos(alpha);
+            // // for (let j = 0; j < 2; j++) {
+            // let r = (Math.random() - 0.5) * diameter*2;
+            // let alpha = Math.random() * pi2;
+            // // let beta = Math.random() * pi2;
+            // // let alpha = pi2 / lineNum * i;
+            // let beta = pi2 / lineNum * i;
+            // let x1 = r * Math.sin(alpha) * Math.cos(beta);
+            // let y1 = r * Math.sin(alpha) * Math.sin(beta);
+            // let z1 = r * Math.cos(alpha);
+
+            let x1=(Math.random() - 0.5) * diameter
+            let y1=(Math.random() - 0.5) * diameter
+            let z1=(Math.random() - 0.5) * diameter
 
             positions.push(x1, y1, z1);
 
             alpha = Math.random() * pi2;
             beta = Math.random() * pi2;
-            let x2 = x1 + lineLength * Math.sin(beta) * Math.cos(alpha);
-            let y2 = y1 + lineLength * Math.sin(beta) * Math.sin(alpha);
+            // let x2 = x1 + lineLength * Math.sin(beta) * Math.cos(alpha);
+            // let y2 = y1 + lineLength * Math.sin(beta) * Math.sin(alpha);
+            // let z2 = z1 + lineLength * Math.cos(beta);
+            
+            let x2 = x1 + lineLength * Math.sin(beta) * Math.sin(alpha);
+            let y2 = y1 + lineLength * Math.sin(beta) * Math.cos(alpha);
             let z2 = z1 + lineLength * Math.cos(beta);
 
             positions.push(x2, y2, z2);
 
             // colors
 
-            colors.push((x1 / r) + 0.5);
-            colors.push((y1 / r) + 0.5);
-            colors.push((z1 / r) + 0.5);
-            colors.push((x2 / r) + 0.5);
-            colors.push((y2 / r) + 0.5);
-            colors.push((z2 / r) + 0.5);
+            colors.push((x1 / diameter) + 0.5);
+            colors.push((y1 / diameter) + 0.5);
+            colors.push((z1 / diameter) + 0.5);
+            colors.push((x2 / diameter) + 0.5);
+            colors.push((y2 / diameter) + 0.5);
+            colors.push((z2 / diameter) + 0.5);
 
             indices.push(i * 2, 2 * i + 1);
             // }
