@@ -7,6 +7,14 @@
     var raycaster;
     var mouse = new THREE.Vector2();
 
+    // var linePositions=new Array();
+    var positions = [];
+    var colors = [];
+    var pointPositions = [];
+    // var scales = [];
+    var points;
+    var pointGeometry;
+
     (function () {
         let container = document.createElement('div');
         document.body.appendChild(container);
@@ -44,6 +52,12 @@
         let geometry = createLines();
         mesh = new THREE.LineSegments(geometry, material);
         scene.add(mesh);
+
+        pointGeometry = new THREE.BufferGeometry();
+        // pointGeometry = createPoints();
+        let pointMaterial = new THREE.PointsMaterial({ size: 15, vertexColors: THREE.VertexColors });
+        points = new THREE.Points(pointGeometry, pointMaterial);
+        scene.add(points);
 
         window.addEventListener('resize', onWindowResize, false);
     })();
@@ -85,17 +99,68 @@
             raycaster = new THREE.Raycaster();
             raycaster.setFromCamera(mouse, camera);
 
-            let ray=raycaster.ray;
-            let direction=ray.direction;
+
+            (function () {
+                let ray = raycaster.ray;
+                let direction = ray.direction;
+                let origin = ray.origin;
+                let x1 = origin.x, y1 = origin.y, z1 = origin.z;
+                let a1 = direction.x, b1 = direction.y, c1 = direction.z;
+
+                // let pointPositions=[];   
+                // var scales  =[];           
+
+                for (let i = 0; i < positions.length; i += 6) {
+                    let p1 = new THREE.Vector3(positions[i], positions[i + 1], positions[i + 2]);
+                    let p2 = new THREE.Vector3(positions[i + 3], positions[i + 4], positions[i + 5]);
+                    let lineDirection = new THREE.Vector3();
+                    lineDirection.subVectors(p1, p2);
+                    lineDirection.normalize();
+
+                    let normal = new THREE.Vector3();
+                    normal.crossVectors(direction, lineDirection);
+
+                    let a2 = lineDirection.x, b2 = lineDirection.y, c2 = lineDirection.z;
+                    let a3 = normal.x, b3 = normal.y, c3 = normal.z;
+                    let x3 = p1.x, y3 = p1.y, z3 = p1.z;
+                    let x5 = (a3 * x3 + b3 * b3 / a3 * x1 - b3 * (y1 - y3) + c3 * c3 / a3 * x1 - c3 * (z1 - z3)) / (a3 + b3 * b3 / a3 + c3 * c3 / a3);
+                    let y5 = b3 / a3 * (x5 - x1) + y1;
+                    let z5 = c3 / a3 * (x5 - x1) + z1;
+
+                    let x6 = (b1 / a1 * x5 - y5 - (b2 / a2) * x3 + y3) / (b1 / a1 - b2 / a2);
+                    let y6 = b1 / a1 * (x6 - x5) + y5;
+                    let z6 = c1 / a1 * (x6 - x5) + z5;
+
+                    pointPositions.push(x6, y6, z6);
+
+                    // scales.push(8);
+
+
+                }
+
+                pointGeometry = new THREE.BufferGeometry();
+                geometry.addAttribute('position', new THREE.Float32BufferAttribute(pointPositions, 3));
+                // geometry.addAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+                points.geometry = pointGeometry;
+            })()
+
         }
 
+    }
+
+    function createPoints() {
+        var geometry = new THREE.BufferGeometry();
+        geometry.addAttribute('position', new THREE.Float32BufferAttribute(positions, 3));
+        geometry.addAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
+        // geometry.addAttribute('scale', new THREE.Float32BufferAttribute(scales, 1));
+        geometry.computeBoundingSphere();
+
+        return geometry;
     }
 
     function createLines() {
         let diameter = 1000;
         let geometry = new THREE.BufferGeometry();
-        let positions = [];
-        let colors = [];
         let indices = [];
         let pi2 = Math.PI * 2;
         let lineLength = 300;
@@ -140,6 +205,9 @@
             colors.push((z2 / diameter) + 0.5);
 
             indices.push(i * 2, 2 * i + 1);
+
+            // pointPositions.push(x1, y1, z1, x2, y2, z2);
+            // scales.push(8, 8);
             // }
         }
         geometry.setIndex(indices);
@@ -149,3 +217,4 @@
         return geometry;
     }
 })()
+
