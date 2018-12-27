@@ -4,6 +4,8 @@
     var camera, mesh, scene, renderer;
     var controls;
     var lineNum = 10;
+    var raycaster;
+    var mouse = new THREE.Vector2();
 
     (function () {
         let container = document.createElement('div');
@@ -35,6 +37,8 @@
         controls.keys = [65, 83, 68];
 
         controls.addEventListener('change', render);
+        container.addEventListener('mouseup', onMouseUp);
+        container.addEventListener('mousedown', onMouseDown);
 
         var material = new THREE.LineBasicMaterial({ vertexColors: THREE.VertexColors });
         let geometry = createLines();
@@ -62,6 +66,31 @@
         renderer.setSize(window.innerWidth, window.innerHeight);
     }
 
+    var lastMouse = new THREE.Vector2();
+
+    function onMouseDown(event) {
+        event.preventDefault();
+
+        lastMouse.x = event.clientX;
+        lastMouse.y = event.clientY;
+    }
+
+    function onMouseUp(event) {
+        event.preventDefault();
+        // alert("hahaha");
+        if (lastMouse.x === event.clientX && lastMouse.y === event.clientY) {
+            mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+            mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+            raycaster = new THREE.Raycaster();
+            raycaster.setFromCamera(mouse, camera);
+
+            let ray=raycaster.ray;
+            let direction=ray.direction;
+        }
+
+    }
+
     function createLines() {
         let diameter = 1000;
         let geometry = new THREE.BufferGeometry();
@@ -83,9 +112,9 @@
             // let y1 = r * Math.sin(alpha) * Math.sin(beta);
             // let z1 = r * Math.cos(alpha);
 
-            let x1=(Math.random() - 0.5) * diameter
-            let y1=(Math.random() - 0.5) * diameter
-            let z1=(Math.random() - 0.5) * diameter
+            let x1 = (Math.random() - 0.5) * diameter
+            let y1 = (Math.random() - 0.5) * diameter
+            let z1 = (Math.random() - 0.5) * diameter
 
             positions.push(x1, y1, z1);
 
@@ -94,7 +123,7 @@
             // let x2 = x1 + lineLength * Math.sin(beta) * Math.cos(alpha);
             // let y2 = y1 + lineLength * Math.sin(beta) * Math.sin(alpha);
             // let z2 = z1 + lineLength * Math.cos(beta);
-            
+
             let x2 = x1 + lineLength * Math.sin(beta) * Math.sin(alpha);
             let y2 = y1 + lineLength * Math.sin(beta) * Math.cos(alpha);
             let z2 = z1 + lineLength * Math.cos(beta);
