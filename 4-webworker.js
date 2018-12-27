@@ -10,7 +10,7 @@
     // var linePositions=new Array();
     var positions = [];
     var colors = [];
-    var pointPositions = [];
+    // var pointPositions = [];
     // var scales = [];
     var points;
     var pointGeometry;
@@ -28,7 +28,7 @@
         camera.position.z = 2000;
 
         scene = new THREE.Scene();
-        scene.background = new THREE.Color(0x000000);
+        scene.background = new THREE.Color(0xf0f0f0);
         scene.add(camera);
 
         controls = new THREE.TrackballControls(camera, container);
@@ -99,16 +99,20 @@
             raycaster = new THREE.Raycaster();
             raycaster.setFromCamera(mouse, camera);
 
-
             (function () {
+
+                pointGeometry.removeAttribute('position');
+                pointGeometry.removeAttribute('color');
+
                 let ray = raycaster.ray;
                 let direction = ray.direction;
                 let origin = ray.origin;
                 let x1 = origin.x, y1 = origin.y, z1 = origin.z;
                 let a1 = direction.x, b1 = direction.y, c1 = direction.z;
 
-                // let pointPositions=[];   
-                // var scales  =[];           
+                let pointPositions=[];   
+                // var scales  =[];  
+                let pointColors = [];
 
                 for (let i = 0; i < positions.length; i += 6) {
                     let p1 = new THREE.Vector3(positions[i], positions[i + 1], positions[i + 2]);
@@ -135,15 +139,20 @@
 
                     // scales.push(8);
 
-
+                    pointColors.push(1, 0, 0);
                 }
 
-                pointGeometry = new THREE.BufferGeometry();
-                geometry.addAttribute('position', new THREE.Float32BufferAttribute(pointPositions, 3));
-                // geometry.addAttribute('color', new THREE.Float32BufferAttribute(colors, 3));
-                points.geometry = pointGeometry;
-            })()
+                // let geometry = new THREE.BufferGeometry();
+                pointGeometry.addAttribute('position', new THREE.Float32BufferAttribute(pointPositions, 3));
+                pointGeometry.addAttribute('color', new THREE.Float32BufferAttribute(pointColors, 3));
+                // points.geometry = geometry;
 
+                // var ps=points.geometry.attributes.position.array;
+                // pointGeometry.attributes.position.needsUpdate = true;
+                // pointGeometry.attributes.color.needsUpdate = true;
+
+                render();
+            })()
         }
 
     }
