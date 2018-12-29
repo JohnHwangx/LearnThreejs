@@ -312,7 +312,8 @@ THREE.TrackballControls = function ( object, domElement ) {
 		_this.object.lookAt( _this.target );
 
 		if ( lastPosition.distanceToSquared( _this.object.position ) > EPS ) {
-
+			// _this.object.updateMatrixWorld();
+			// _this.object.updateProjectionMatrix();
 			_this.dispatchEvent( changeEvent );
 
 			lastPosition.copy( _this.object.position );
