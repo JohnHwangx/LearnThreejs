@@ -20,6 +20,13 @@
     <script src="js/WebGL.js"></script>
     <script src="js/controls/OrbitControls.js"></script>
     <script src="js/libs/dat.gui.min.js"></script>
+
+    <script src="js/postprocessing/EffectComposer.js"></script>
+    <script src="js/postprocessing/RenderPass.js"></script>
+    <script src="js/postprocessing/ShaderPass.js"></script>
+    <script src="shaders/CopyShader.js"></script>
+    <script src="shaders/DotScreenShader.js"></script>
+    <script src="shaders/RGBShiftShader.js"></script>
 </head>
 
 <body>
@@ -47,10 +54,12 @@
 
     <!-- <script src="my_progressive_rendering.js"></script> -->
 
-    <script src="4-webworker.js"></script>
+    <!-- <script src="4-webworker.js"></script> -->
     <!-- <script src="4-webworker_worker.js"></script> -->
 
     <!-- <script src="bufferGeometry_line_index.js"></script> -->
+    
+    <script src="postprocessing.js"></script>
 </body>
 
 </html>
