@@ -71,10 +71,10 @@ function start() {
         posttarget = new THREE.WebGLRenderTarget(container.clientWidth, container.clientHeight, offscreenOpt);
         posttarget.texture.generateMipmaps = false;
 
+        effect = new THREE.ShaderPass(THREE.DotScreenShader);
+
         // composer = new THREE.EffectComposer(renderer);
         // composer.addPass(new THREE.RenderPass(scene, camera));
-
-        effect = new THREE.ShaderPass(THREE.DotScreenShader);
         // effect.renderToScreen = true;
         // composer.addPass(effect);
 
@@ -88,7 +88,7 @@ function start() {
         camera.updateProjectionMatrix();
 
         renderer.setSize(window.innerWidth, window.innerHeight);
-        // composer.setSize(window.innerWidth, window.innerHeight);
+        composer.setSize(window.innerWidth, window.innerHeight);
     }
 
     function animate() {
@@ -100,7 +100,11 @@ function start() {
         // composer.render();
         // renderer.render(scene,camera);
 
-        effect.render(renderer, posttarget, colortarget);
+        // effect.render(renderer, posttarget, colortarget);
+    }
+
+    function render(){
+
     }
 
 
