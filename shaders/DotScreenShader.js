@@ -1,7 +1,7 @@
 THREE.DotScreenShader = {
     uniforms: {
         "tDiffuse": { value: null },
-        "tsize": { value: new THREE.Vector2(256, 256) },
+        "tSize": { value: new THREE.Vector2(256, 256) },
         "center": { value: new THREE.Vector2(0.5, 0.5) },
         "angle": { value: 1.57 },
         "scale": { value: 1.0 }

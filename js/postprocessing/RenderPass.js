@@ -7,7 +7,7 @@ THREE.RenderPass = function (scene, camera, overrideMaterial, clearColor, clearA
     this.overrideMaterial = overrideMaterial;
 
     this.clearColor = clearColor;
-    this.clearAlpha = (clearAlpha != undefined) ? clearAlpha : 0;
+    this.clearAlpha = (clearAlpha !== undefined) ? clearAlpha : 0;
 
     this.clear = true;
     this.clearDepth = false;
@@ -45,4 +45,4 @@ THREE.RenderPass.prototype = Object.assign(Object.create(THREE.Pass.prototype), 
         this.scene.overrideMaterial = null;
         renderer.autoClear = oldAutoClear;
     }
-})
+});
