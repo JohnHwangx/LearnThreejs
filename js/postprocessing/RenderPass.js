@@ -11,7 +11,7 @@ THREE.RenderPass = function (scene, camera, overrideMaterial, clearColor, clearA
 
     this.clear = true;
     this.clearDepth = false;
-    this.needSwap = false;
+    this.needsSwap = false;
 };
 
 THREE.RenderPass.prototype = Object.assign(Object.create(THREE.Pass.prototype), {

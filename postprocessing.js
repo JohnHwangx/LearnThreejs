@@ -10,18 +10,21 @@ start();
 function start() {
     var camera, scene, renderer, composer, container;
     var object, light;
+    var effect;
+
+    var colortarget, posttarget;
 
     init();
     animate();
 
     function init() {
-        // container = document.createElement('div');
-        // document.body.appendChild(container);
+        container = document.createElement('div');
+        document.body.appendChild(container);
 
         renderer = new THREE.WebGLRenderer();
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
-        document.body.appendChild(renderer.domElement);
+        container.appendChild(renderer.domElement);
 
         camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
         camera.position.z = 400;
@@ -31,8 +34,11 @@ function start() {
         scene.add(object);
 
         var geometry = new THREE.SphereBufferGeometry(1, 4, 4);
-        var material = new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true });
+
         for (let i = 0; i < 100; i++) {
+
+            var material = new THREE.MeshPhongMaterial({ color: 0xffffff * Math.random(), flatShading: true });
+
             var mesh = new THREE.Mesh(geometry, material);
             mesh.position.set(Math.random() - 0.5, Math.random() - 0.5, Math.random() - 0.5).normalize();
             mesh.position.multiplyScalar(Math.random() * 400);
@@ -43,39 +49,72 @@ function start() {
 
         scene.add(new THREE.AmbientLight(0x222222));
 
-        light=new THREE.DirectionalLight(0xffffff);
-        light.position.set(1,1,1,1);
+        light = new THREE.DirectionalLight(0xffffff);
+        light.position.set(1, 1, 1);
         scene.add(light);
 
-        composer=new THREE.EffectComposer(renderer);
-        composer.addPass(new THREE.RenderPass(scene,camera));
+        let offscreenOpt = {
+            minFilter: THREE.LinearFilter,
+            magFilter: THREE.LinearFilter,
+            format: THREE.RGBAFormat,
+            stencilBuffer: false,
+            // depthBuffer:true
+        }
 
-        var effect=new THREE.ShaderPass(THREE.DotScreenShader);
-        effect.uniforms['scale'].value= 4;
-        composer.addPass(effect);
+        let depthTexture = new THREE.DepthTexture();
+        depthTexture.type = THREE.UnsignedShortType;
 
-        var effect = new THREE.ShaderPass(THREE.RGBShiftShader);
-        effect.uniforms['amount'].value=0.0015;
-        effect.renderToScreen=true;
-        composer.addPass(effect);
+        colortarget = new THREE.WebGLRenderTarget(container.clientWidth, container.clientHeight, offscreenOpt);
+        colortarget.depthTexture = depthTexture;
+        colortarget.texture.generateMipmaps = false;
 
-        window.addEventListener('resize',onWindowResize,false);
+        posttarget = new THREE.WebGLRenderTarget(container.clientWidth, container.clientHeight, offscreenOpt);
+        posttarget.texture.generateMipmaps = false;
+
+        // composer = new THREE.EffectComposer(renderer);
+        // composer.addPass(new THREE.RenderPass(scene, camera));
+
+        effect = new THREE.ShaderPass(THREE.DotScreenShader);
+        // effect.renderToScreen = true;
+        // composer.addPass(effect);
+
+        window.addEventListener('resize', onWindowResize, false);
+
+        initGUI();
     }
 
     function onWindowResize() {
-        camera.aspect=window.innerWidth/window.innerHeight;
+        camera.aspect = window.innerWidth / window.innerHeight;
         camera.updateProjectionMatrix();
 
-        renderer.setSize(window.innerWidth,window.innerHeight);
-        composer.setSize(window.innerWidth,window.innerHeight);
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        // composer.setSize(window.innerWidth, window.innerHeight);
     }
 
     function animate() {
         requestAnimationFrame(animate);
 
-        object.rotation.x+=0.005;
-        object.rotation.y+=0.01;
+        object.rotation.x += 0.005;
+        object.rotation.y += 0.01;
 
-        composer.render();
+        // composer.render();
+        // renderer.render(scene,camera);
+
+        effect.render(renderer, posttarget, colortarget);
+    }
+
+
+    function initGUI() {
+        var param = {
+
+            greyscale: effect.uniforms.greyscale.value,
+        };
+
+        let gui = new dat.GUI();
+        // let folder = gui.addFolder('test');
+        gui.add(param, 'greyscale').onChange(function () {
+            effect.uniforms.greyscale.value = param.greyscale;
+        });
+        // folder.open();
     }
 }

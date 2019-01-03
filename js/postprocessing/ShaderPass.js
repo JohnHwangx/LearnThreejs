@@ -25,16 +25,27 @@ THREE.ShaderPass = function (shader, textureID) {
 };
 
 THREE.ShaderPass.prototype = Object.assign(Object.create(THREE.Pass.prototype), {
+
     constructor: THREE.ShaderPass,
+
     render: function (renderer, writeBuffer, readBuffer, delta, maskActive) {
+
         if (this.uniforms[this.textureID]) {
+
             this.uniforms[this.textureID].value = readBuffer.texture;
+
         }
+
         this.quad.material = this.material;
+
         if (this.renderToScreen) {
+
             renderer.render(this.scene, this.camera);
+
         } else {
+
             renderer.render(this.scene, this.camera, writeBuffer, this.clear);
+            
         }
     }
 })
