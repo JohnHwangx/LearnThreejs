@@ -22,6 +22,8 @@ THREE.RenderPass.prototype = Object.assign(Object.create(THREE.Pass.prototype), 
         var oldAutoClear = renderer.autoClear;
         renderer.autoClear = false;
 
+		this.scene.overrideMaterial = this.overrideMaterial;
+
         var oldClearColor, oldClearAlpha;
         if (this.clearColor) {
             oldClearColor = renderer.getClearColor().getHex();

@@ -15,13 +15,13 @@ function start() {
     animate();
 
     function init() {
-        container = document.createElement('div');
-        document.body.appendChild(container);
+        // container = document.createElement('div');
+        // document.body.appendChild(container);
 
         renderer = new THREE.WebGLRenderer();
         renderer.setPixelRatio(window.devicePixelRatio);
         renderer.setSize(window.innerWidth, window.innerHeight);
-        container.appendChild(renderer.domElement);
+        document.body.appendChild(renderer.domElement);
 
         camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
         camera.position.z = 400;
