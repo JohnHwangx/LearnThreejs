@@ -72,10 +72,10 @@ function start() {
         posttarget.texture.generateMipmaps = false;
 
         effect = new THREE.ShaderPass(THREE.DotScreenShader);
+        effect.renderToScreen = true;
 
         // composer = new THREE.EffectComposer(renderer);
         // composer.addPass(new THREE.RenderPass(scene, camera));
-        // effect.renderToScreen = true;
         // composer.addPass(effect);
 
         window.addEventListener('resize', onWindowResize, false);
@@ -101,10 +101,15 @@ function start() {
         // renderer.render(scene,camera);
 
         // effect.render(renderer, posttarget, colortarget);
+        render();
     }
 
-    function render(){
-        
+    function render() {
+        let oldAutoClear = renderer.autoClear;
+        renderer.autoClear = false;
+        renderer.render(scene, camera, colortarget, true);
+        renderer.autoClear = oldAutoClear;
+        effect.render(renderer, posttarget, colortarget);
     }
 
 
