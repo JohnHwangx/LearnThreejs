@@ -10,7 +10,7 @@ start();
 function start() {
     var camera, scene, renderer, composer, container;
     var object, light;
-    var effect;
+    var grayShader, brightShader;
 
     var colortarget, posttarget;
 
@@ -71,8 +71,11 @@ function start() {
         posttarget = new THREE.WebGLRenderTarget(container.clientWidth, container.clientHeight, offscreenOpt);
         posttarget.texture.generateMipmaps = false;
 
-        effect = new THREE.ShaderPass(THREE.DotScreenShader);
-        effect.renderToScreen = true;
+        grayShader = new THREE.ShaderPass(THREE.DotScreenShader);
+        // grayShader.renderToScreen = true;
+
+        brightShader = new THREE.ShaderPass(THREE.BrightnessShader);
+        brightShader.renderToScreen = true;
 
         // composer = new THREE.EffectComposer(renderer);
         // composer.addPass(new THREE.RenderPass(scene, camera));
@@ -109,20 +112,30 @@ function start() {
         renderer.autoClear = false;
         renderer.render(scene, camera, colortarget, true);
         renderer.autoClear = oldAutoClear;
-        effect.render(renderer, posttarget, colortarget);
+        grayShader.render(renderer, posttarget, colortarget);
+
+        let temp = colortarget;
+        colortarget = posttarget;
+        posttarget = temp;
+
+        brightShader.render(renderer, posttarget, colortarget);
     }
 
 
     function initGUI() {
         var param = {
 
-            greyscale: effect.uniforms.greyscale.value,
+            greyscale: grayShader.uniforms.greyscale.value,
+            brightness: brightShader.uniforms.brightness.value,
         };
 
         let gui = new dat.GUI();
         // let folder = gui.addFolder('test');
         gui.add(param, 'greyscale').onChange(function () {
-            effect.uniforms.greyscale.value = param.greyscale;
+            grayShader.uniforms.greyscale.value = param.greyscale;
+        });
+        gui.add(param, 'brightness').onChange(function () {
+            brightShader.uniforms.brightness.value = param.brightness;
         });
         // folder.open();
     }

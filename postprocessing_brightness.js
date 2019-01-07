@@ -2,7 +2,7 @@ start();
 function start() {
     var camera, scene, renderer, composer, container;
     var object, light;
-    var effect;
+    var shaderpass;
 
     var colortarget, posttarget;
 
@@ -22,6 +22,7 @@ function start() {
         camera.position.z = 400;
 
         scene = new THREE.Scene();
+        // scene.background = new THREE.Color(0xffffff);
         object = new THREE.Object3D();
         scene.add(object);
 
@@ -63,8 +64,8 @@ function start() {
         posttarget = new THREE.WebGLRenderTarget(container.clientWidth, container.clientHeight, offscreenOpt);
         posttarget.texture.generateMipmaps = false;
 
-        effect = new THREE.ShaderPass(THREE.DotScreenShader);
-        effect.renderToScreen = true;
+        shaderpass = new THREE.ShaderPass(THREE.BrightnessShader);
+        shaderpass.renderToScreen = true;
 
         // composer = new THREE.EffectComposer(renderer);
         // composer.addPass(new THREE.RenderPass(scene, camera));
@@ -89,10 +90,6 @@ function start() {
         object.rotation.x += 0.005;
         object.rotation.y += 0.01;
 
-        // composer.render();
-        // renderer.render(scene,camera);
-
-        // effect.render(renderer, posttarget, colortarget);
         render();
     }
 
@@ -101,20 +98,20 @@ function start() {
         renderer.autoClear = false;
         renderer.render(scene, camera, colortarget, true);
         renderer.autoClear = oldAutoClear;
-        effect.render(renderer, posttarget, colortarget);
+        shaderpass.render(renderer, posttarget, colortarget);
     }
 
 
     function initGUI() {
         var param = {
 
-            greyscale: effect.uniforms.greyscale.value,
+            brightness: shaderpass.uniforms.brightness.value,
         };
 
         let gui = new dat.GUI();
         // let folder = gui.addFolder('test');
-        gui.add(param, 'greyscale').onChange(function () {
-            effect.uniforms.greyscale.value = param.greyscale;
+        gui.add(param, 'brightness').onChange(function () {
+            shaderpass.uniforms.brightness.value = param.brightness;
         });
         // folder.open();
     }
