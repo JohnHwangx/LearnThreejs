@@ -9,7 +9,7 @@ THREE.CopyShader={
 
         "void main(){",
 
-            "vUv=uv",
+            "vUv=uv;",
             "gl_Position = projectionMatrix * modelMatrix * vec4( position, 1.0);",
 
         "}"
@@ -19,7 +19,7 @@ THREE.CopyShader={
 
         "uniform float opacity;",
 
-        "uniform sampler2D tDiffuse",
+        "uniform sampler2D tDiffuse;",
 
         "varying vec2 vUv;",
 
