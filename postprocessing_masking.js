@@ -31,12 +31,12 @@ function start() {
         var texture = new THREE.TextureLoader().load('textures/758px-Canestra_di_frutta_(Caravaggio).jpg');
         var texturePass = new THREE.TexturePass(texture);
 
-        readBuffer = new THREE.WebGLRenderTarget(container.clientWidth, container.clientHeight, offscreenOpt);
-        // readBuffer.depthTexture = depthTexture;
-        readBuffer.texture.generateMipmaps = false;
+        // readBuffer = new THREE.WebGLRenderTarget(container.clientWidth, container.clientHeight, offscreenOpt);
+        // // readBuffer.depthTexture = depthTexture;
+        // readBuffer.texture.generateMipmaps = false;
 
-        writeBuffer = new THREE.WebGLRenderTarget(container.clientWidth, container.clientHeight, offscreenOpt);
-        writeBuffer.texture.generateMipmaps = false;
+        // writeBuffer = new THREE.WebGLRenderTarget(container.clientWidth, container.clientHeight, offscreenOpt);
+        // writeBuffer.texture.generateMipmaps = false;
 
         var outputPass = new THREE.ShaderPass(THREE.CopyShader);
         outputPass.renderToScreen = true;
@@ -47,6 +47,9 @@ function start() {
             format: THREE.RGBFormat,
             stencilBuffer: true
         }
+
+        readBuffer = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, parameters);
+        writeBuffer = readBuffer.clone();
 
         var renderTarget = new THREE.WebGLRenderTarget(window.innerWidth, window.innerHeight, parameters);
 
