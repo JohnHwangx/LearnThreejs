@@ -120,10 +120,13 @@ function start() {
         clean();
 
         var geo = new THREE.SphereBufferGeometry(1, 4, 4);
+        geo = geo.toNonIndexed();
+        geo.computeBoundingBox();
+        geo.boundingBox.getSize(geometrySize);
+        geometryList.push(geo);
         makeSingleMaterial(geo);
 
         render();
-
     }
 
     function makeSingleMaterial(geo) {
@@ -366,7 +369,7 @@ function start() {
         if (object) {
             if (object.position && object.rotation && object.scale) {
                 highlightBox.position.copy(object.position);
-                highlightBox.position.copy(object.rotation);
+                highlightBox.rotation.copy(object.rotation);
 
                 highlightBox.scale.copy(object.scale).multiply(geometrySize).multiplyScalar(scale);
 
