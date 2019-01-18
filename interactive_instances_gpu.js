@@ -2,7 +2,8 @@ start();
 
 function start() {
 
-    var vertMaterial = ["#define SHADER_NAME vertMaterial",
+    var vertMaterial = [
+        "#define SHADER_NAME vertMaterial",
 
         "precision highp float;",
 
@@ -27,7 +28,8 @@ function start() {
 
         "}"].join("\n");
 
-    var fragMaterial = ["#define SHADER_NAME fragMaterial",
+    var fragMaterial = [
+        "#define SHADER_NAME fragMaterial",
 
         "#extension GL_OES_standard_derivatives : enable",
 
@@ -81,7 +83,7 @@ function start() {
 
     function gui() {
 
-        var instanceCountElem = 1000;//模型数量
+        var instanceCountElem = 2;//模型数量
         instanceCount = parseInt(instanceCountElem);
 
         doAnimate = true;
