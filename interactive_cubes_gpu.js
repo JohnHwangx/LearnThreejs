@@ -5,7 +5,7 @@ function start() {
     var highlightBox;
 
     var mouse = new THREE.Vector2();
-    var offset = new THREE.Vector3(10, 10, 10);
+    var offset = new THREE.Vector3(1, 1, 1);
 
     init();
     animate();
