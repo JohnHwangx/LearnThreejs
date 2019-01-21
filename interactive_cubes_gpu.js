@@ -14,8 +14,8 @@ function start() {
         container = document.createElement('div');
         document.body.appendChild(container);
 
-        camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 10000);
-        camera.position.z = 1000;
+        camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 1, 1000);
+        camera.position.z = 100;
 
         controls = new THREE.TrackballControls(camera);
         controls.rotateSpeed = 1.0;
@@ -32,11 +32,11 @@ function start() {
         pickingScene = new THREE.Scene();
         pickingTexture = new THREE.WebGLRenderTarget(1, 1);
 
-        scene.add(new THREE.AmbientLight(0x555555));
+        scene.add(new THREE.AmbientLight(0xffffff));
 
-        var light = new THREE.SpotLight(0xffffff, 1.5);
-        light.position.set(0, 500, 2000);
-        scene.add(light);
+        // var light = new THREE.SpotLight(0xffffff, 1.5);
+        // light.position.set(0, 500, 2000);
+        // scene.add(light);
 
         var pickingMaterial = new THREE.MeshBasicMaterial({ vertexColors: THREE.VertexColors });
         var defaultMaterial = new THREE.MeshPhongMaterial({ color: 0xffffff, flatShading: true, vertexColors: THREE.VertexColors, shininess: 0 });
@@ -59,13 +59,13 @@ function start() {
         let quaternion = new THREE.Quaternion();
         let color = new THREE.Color();
 
-        for (let i = 0; i < 5000; i++) {
+        for (let i = 0; i < 5; i++) {
             let geometry = new THREE.BoxBufferGeometry();
 
             let position = new THREE.Vector3();
-            position.x = Math.random() * 10000 - 5000;
-            position.y = Math.random() * 10000 - 5000;
-            position.z = Math.random() * 10000 - 5000;
+            position.x = Math.random() * 100 - 50;
+            position.y = Math.random() * 100 - 50;
+            position.z = Math.random() * 100 - 50;
 
             let rotation = new THREE.Euler();
             rotation.x = Math.random() * 2 * Math.PI;
@@ -73,9 +73,9 @@ function start() {
             rotation.z = Math.random() * 2 * Math.PI;
 
             let scale = new THREE.Vector3();
-            scale.x = Math.random() * 200 + 100;
-            scale.y = Math.random() * 200 + 100;
-            scale.z = Math.random() * 200 + 100;
+            scale.x = Math.random() * 20 + 10;
+            scale.y = Math.random() * 20 + 10;
+            scale.z = Math.random() * 20 + 10;
 
             quaternion.setFromEuler(rotation, false);
             matrix.compose(position, quaternion, scale);

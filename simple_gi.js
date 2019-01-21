@@ -7,7 +7,7 @@ function start() {
 
     var SimpleGI = function (renderer, scene) {
         let SIZE = 1, SIZE2 = SIZE * SIZE;
-        let camera = new THREE.PerspectiveCamera(90, 1, 0.01, 100);
+        let camera = new THREE.PerspectiveCamera();
         scene.updateMatrixWorld(true);
 
         let clone = scene.clone();
