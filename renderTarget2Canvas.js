@@ -11,11 +11,13 @@ function start() {
 
     function init() {
         preview = document.createElement('canvas');
+        preview.width = 300;
+        preview.height = 300;
         preview.style.width = '150px';
         preview.style.height = '150px';
-        preview.style.position='absolute';
-        // preview.style.left = '0px';
-        // preview.style.top = '0px';
+        preview.style.position = 'absolute';
+        preview.style.left = '0px';
+        preview.style.top = '0px';
         document.body.appendChild(preview)
 
         container = document.createElement('div');
@@ -25,9 +27,10 @@ function start() {
         rendertarget = new THREE.WebGLRenderTarget(RT_SIZE, RT_SIZE);
 
         camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 1, 1000);
-        camera.position.x = 2;
-        camera.position.y = 2;
-        camera.position.z = 2;
+        camera.position.set(2,2,2);
+        // camera.position.x = 2;
+        // camera.position.y = 2;
+        // camera.position.z = 2;
         camera.lookAt(0, 0, 0);
 
         //创建场景
