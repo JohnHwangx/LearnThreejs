@@ -72,7 +72,7 @@ function start() {
         let quaternion = new THREE.Quaternion();
         let color = new THREE.Color();
 
-        for (let i = 0; i < 5; i++) {
+        for (let i = 0; i < 60000; i++) {
             let geometry = new THREE.BoxBufferGeometry();
 
             let position = new THREE.Vector3();
