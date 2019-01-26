@@ -72,7 +72,7 @@ function start() {
         let quaternion = new THREE.Quaternion();
         let color = new THREE.Color();
 
-        for (let i = 0; i < 60000; i++) {
+        for (let i = 0; i < 6; i++) {
             let geometry = new THREE.BoxBufferGeometry();
 
             let position = new THREE.Vector3();
@@ -95,12 +95,14 @@ function start() {
             geometry.applyMatrix(matrix);
 
             applyVertexColor(geometry, color.setHex(Math.random() * 0xffffff));
+            scene.add(geometry);
             geometriesDrawn.push(geometry);
 
             geometry = geometry.clone();
 
             // applyVertexInfo(geometry, i + 1);
             applyVertexInfo(geometry, color.setHex(i + 1));
+            pickingScene.add(geometry);
             geometriesPicking.push(geometry);
 
             pickingData[i + 1] = {
@@ -111,11 +113,11 @@ function start() {
             };
         }
 
-        let objects = new THREE.Mesh(THREE.BufferGeometryUtils.mergeBufferGeometries(geometriesDrawn), defaultMaterial);
-        scene.add(objects);
+        // let objects = new THREE.Mesh(THREE.BufferGeometryUtils.mergeBufferGeometries(geometriesDrawn), defaultMaterial);
+        // scene.add(objects);
 
-        let pickingObjects = new THREE.Mesh(THREE.BufferGeometryUtils.mergeBufferGeometries(geometriesPicking), pickingMaterial);
-        pickingScene.add(pickingObjects);
+        // let pickingObjects = new THREE.Mesh(THREE.BufferGeometryUtils.mergeBufferGeometries(geometriesPicking), pickingMaterial);
+        // pickingScene.add(pickingObjects);
 
         highlightBox = new THREE.Mesh(
             new THREE.BoxBufferGeometry(),
