@@ -6,7 +6,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>three.js webgl - MRT</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <script id="gbuffer-vert" type="shader/x-vertex">
+    <script id="gbuffer-vert" type="x-shader/x-vertex">
         #extension GL_EXT_draw_buffers : require
         uniform mat4 projectionMatrix;
         uniform mat4 modelViewMatrix;
@@ -78,6 +78,7 @@
 </head>
 
 <body>
+    <canvas></canvas>
     <script>
         var camera, scene, renderer, controls;
         var target;
@@ -88,7 +89,9 @@
         animate();
 
         function init() {
-            renderer = new THREE.WebGLRenderer();
+            renderer = new THREE.WebGLRenderer({
+                canvas: document.querySelector('canvas')
+            });
 
             if (!renderer.extensions.get('WEBGL_draw_buffers')) {
                 supportsMRT = false;
@@ -98,7 +101,7 @@
             renderer.setPixelRatio(window.devicePixelRatio);
             renderer.setSize(window.innerWidth, window.innerHeight);
 
-            camera = new THREE.PerspectiveCamera(70, window.innerWidth, window.innerHeight, 0.001, 1000);
+            camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.001, 1000);
             camera.position.z = -4;
 
             controls = new THREE.OrbitControls(camera, renderer.domElement);
@@ -107,9 +110,9 @@
             controls.rotateSpeed = 0.35;
 
             target = new THREE.WebGLMultiRenderTarget(window.innerWidth, window.innerHeight);
-            target.texture.format = THREE.RGBAFormat;
+            target.texture.format = THREE.RGBFormat;
             target.texture.minFilter = THREE.NearestFilter;
-            target.texture.magFiletr = THREE.NearestFilter;
+            target.texture.magFilter = THREE.NearestFilter;
             target.texture.type = THREE.FloatType;
             target.texture.generateMipmaps = false;
             target.stencilBuffer = false;
